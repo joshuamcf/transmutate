@@ -1,0 +1,1071 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Healthdirect Word → HTML converter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ---- Healthdirect Australia brand tokens ---- */
+  :root{
+    --hd-blue:#1e4759;     /* primary / text / headings */
+    --hd-green:#009f96;    /* accent */
+    --hd-orange:#f2896f;
+    --hd-yellow:#f5b672;
+    --hd-red:#dc5456;      /* errors / alerts only */
+    --hd-white:#ffffff;
+    --ink:#1e4759;
+    --line:#d4dde1;
+    --bg:#f3f6f7;
+    --bg-soft:#ebf6f8;
+    --muted:#5b7180;
+    --radius:8px;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:"Open Sans",Arial,Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.5;
+    font-size:15px;
+  }
+  a{color:var(--hd-green)}
+  header.app{
+    background:var(--hd-blue);
+    color:#fff;
+    padding:18px 22px;
+    border-bottom:4px solid var(--hd-green);
+  }
+  header.app h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px}
+  header.app p{margin:4px 0 0;font-size:13px;color:#cfe0e6;max-width:80ch}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 22px 60px}
+
+  /* options bar */
+  .options{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:12px 14px;margin-bottom:16px;
+    display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;
+  }
+  .options .grp{display:flex;align-items:center;gap:8px}
+  .options label{font-size:13px;cursor:pointer;user-select:none}
+  .options input[type=checkbox]{width:16px;height:16px;accent-color:var(--hd-green);cursor:pointer}
+  .options .sep{flex:1}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+  @media (max-width:920px){.cols{grid-template-columns:1fr}}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  .panel > .head{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px;border-bottom:1px solid var(--line);background:#fafcfc;
+  }
+  .panel > .head h2{font-size:14px;margin:0;font-weight:700}
+  .panel > .head .spacer{flex:1}
+  .panel .body{padding:14px}
+
+  /* tabs */
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);background:#fafcfc}
+  .tabs button{
+    appearance:none;border:0;background:transparent;cursor:pointer;
+    padding:10px 14px;font:inherit;font-size:13px;color:var(--muted);
+    border-bottom:3px solid transparent;margin-bottom:-1px;
+  }
+  .tabs button[aria-selected="true"]{color:var(--hd-blue);font-weight:700;border-bottom-color:var(--hd-green)}
+  .tabs button:focus-visible{outline:2px solid var(--hd-green);outline-offset:-2px}
+  .tabpane{display:none}
+  .tabpane.active{display:block}
+
+  /* paste / output areas */
+  .editor{
+    min-height:300px;max-height:55vh;overflow:auto;
+    border:1px dashed var(--line);border-radius:6px;background:#fff;
+    padding:12px 14px;font-size:14px;
+  }
+  .editor:empty:before{content:attr(data-ph);color:#9bb0bb}
+  .editor:focus{outline:2px solid var(--hd-green);outline-offset:1px;border-style:solid}
+  .editor h1,.editor h2,.editor h3{color:var(--hd-blue)}
+  textarea.code{
+    width:100%;min-height:300px;max-height:55vh;
+    font-family:var(--mono);font-size:12.5px;line-height:1.55;
+    border:1px solid var(--line);border-radius:6px;padding:12px;resize:vertical;
+    color:#173039;background:#fbfdfd;
+  }
+  textarea.code:focus{outline:2px solid var(--hd-green);outline-offset:1px}
+  pre.out{
+    margin:0;white-space:pre;overflow-wrap:normal;word-break:normal;
+    font-family:var(--mono);font-size:12.5px;line-height:1.55;
+    background:#fbfdfd;border:1px solid var(--line);border-radius:6px;
+    padding:12px;max-height:55vh;overflow:auto;color:#173039;
+  }
+
+  /* buttons */
+  .btn{
+    appearance:none;cursor:pointer;font:inherit;font-size:13px;font-weight:600;
+    border-radius:6px;padding:8px 14px;border:1px solid transparent;
+  }
+  .btn.primary{background:var(--hd-blue);color:#fff}
+  .btn.primary:hover{background:#163a48}
+  .btn.ghost{background:#fff;color:var(--hd-blue);border-color:var(--hd-blue)}
+  .btn.ghost:hover{background:#eef4f5}
+  .btn.small{padding:5px 10px;font-size:12px}
+  .btn:focus-visible{outline:2px solid var(--hd-green);outline-offset:2px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+
+  /* structure preview */
+  .preview{
+    border:1px solid var(--line);border-radius:6px;padding:16px 18px;
+    max-height:55vh;overflow:auto;background:#fff;
+  }
+  .preview h2{font-size:18px;color:var(--hd-blue);border-bottom:1px solid var(--bg-soft);padding-bottom:4px}
+  .preview h3{font-size:15px;color:var(--hd-blue)}
+  .preview .cont_layout-standout{background:var(--bg-soft);border-radius:6px;padding:12px 16px;margin-bottom:14px}
+  .preview .cont_nav-index-table__double-col ul{columns:2}
+  .preview .cont_layout-media-object__icon-standout{
+    display:flex;gap:10px;align-items:flex-start;text-decoration:none;color:var(--hd-blue);
+    background:var(--bg-soft);border-left:4px solid var(--hd-green);padding:10px 14px;border-radius:4px;margin:10px 0;
+  }
+  .preview .cont_layout-media-object__icon-standout i{display:none}
+  .preview figure{border:1px dashed var(--line);padding:10px;border-radius:6px;color:var(--muted);font-size:13px}
+  .preview figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+
+  /* messages / report */
+  .note{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;vertical-align:middle}
+  .badge.ok{background:#e2f4f2;color:#0a6c64}
+  .badge.warn{background:#fdeee0;color:#9a5a17}
+  .badge.err{background:#fbe3e4;color:#a23034}
+  .badge.info{background:#e6eef1;color:#2d4d5b}
+  .muted{color:var(--muted);font-size:12px}
+
+  ul.report{list-style:none;margin:0;padding:0}
+  ul.report li{padding:8px 10px;border:1px solid var(--line);border-radius:6px;margin-bottom:8px;font-size:13px;background:#fff}
+  ul.report li .what{font-weight:600}
+  ul.report li code{font-family:var(--mono);font-size:12px;background:#f1f5f6;padding:1px 5px;border-radius:4px;word-break:break-all}
+
+  table.links{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
+  table.links th{text-align:left;background:#fafcfc;border-bottom:2px solid var(--line);padding:7px 8px;font-weight:700;position:sticky;top:0}
+  table.links td{border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:top}
+  table.links td.url{word-break:break-all}
+  table.links a{color:var(--hd-green)}
+  .scroll{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:6px}
+
+  .live-box{border:1px solid var(--line);border-radius:6px;padding:12px;background:#fbfdfd;margin-top:6px}
+  .live-box input[type=text]{width:100%;font-family:var(--mono);font-size:12px;padding:7px 9px;border:1px solid var(--line);border-radius:6px}
+  .live-box .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--hd-blue);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .stat{font-size:12px;color:var(--muted)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  details.help{margin-top:10px;font-size:12.5px;color:var(--muted)}
+  details.help summary{cursor:pointer;font-weight:600;color:var(--hd-blue)}
+  details.help p{margin:8px 0}
+  @media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="app">
+  <h1>Healthdirect Word → HTML converter</h1>
+  <p>Paste cleaned Word content (after you've actioned the writer's comments). The tool builds the page template, swaps in the approved call-to-action snippets, fixes internal links, and checks links for problems.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- OPTIONS -->
+  <div class="options" aria-label="Conversion options">
+    <div class="grp"><input type="checkbox" id="optRelative" checked><label for="optRelative">Make Healthdirect links relative (recommended — fixes 301s)</label></div>
+    <div class="grp"><input type="checkbox" id="optNav" checked><label for="optNav">Generate “On this page” nav</label></div>
+    <div class="grp"><input type="checkbox" id="optKeyFacts" checked><label for="optKeyFacts">Build “Key facts” box</label></div>
+    <div class="grp"><input type="checkbox" id="optImages" checked><label for="optImages">Convert [IMAGE] placeholders to figure</label></div>
+    <div class="grp"><input type="checkbox" id="optQuotes" checked><label for="optQuotes">Straighten smart quotes (’ ” → ' ")</label></div>
+  </div>
+
+  <div class="cols">
+
+    <!-- INPUT -->
+    <section class="panel" aria-label="Input">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-word" aria-selected="true" aria-controls="pane-word">Paste from Word</button>
+        <button role="tab" id="tab-html" aria-selected="false" aria-controls="pane-html">Paste HTML / text</button>
+        <div class="spacer" style="flex:1"></div>
+      </div>
+      <div class="body">
+        <div class="tabpane active" id="pane-word" role="tabpanel" aria-labelledby="tab-word">
+          <p class="note">Copy in Word (Ctrl/Cmd+C) → click below → paste (Ctrl/Cmd+V). Word’s styles are read directly, so headings, bullets and links are detected automatically.</p>
+          <div id="wordEditor" class="editor" contenteditable="true" spellcheck="false" data-ph="Paste your Word content here…"></div>
+        </div>
+        <div class="tabpane" id="pane-html" role="tabpanel" aria-labelledby="tab-html">
+          <p class="note">Paste raw HTML here instead — e.g. output from another converter, or an existing page you want to re-process.</p>
+          <textarea id="htmlInput" class="code" spellcheck="false" placeholder="<p>Paste HTML here…</p>"></textarea>
+        </div>
+        <div class="btnrow">
+          <button class="btn primary" id="btnConvert">Convert to HTML</button>
+          <button class="btn ghost" id="btnSample">Load sample</button>
+          <button class="btn ghost" id="btnClear">Clear</button>
+          <span class="stat" id="inputStat"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- OUTPUT -->
+    <section class="panel" aria-label="Output">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-out" aria-selected="true" aria-controls="pane-out">HTML output</button>
+        <button role="tab" id="tab-prev" aria-selected="false" aria-controls="pane-prev">Structure preview</button>
+        <button role="tab" id="tab-links" aria-selected="false" aria-controls="pane-links">Link check <span id="linkCount" class="badge info" style="display:none"></span></button>
+      </div>
+      <div class="body">
+        <!-- HTML output -->
+        <div class="tabpane active" id="pane-out" role="tabpanel" aria-labelledby="tab-out">
+          <pre class="out" id="outCode" aria-live="polite">Your converted HTML will appear here.</pre>
+          <div class="btnrow">
+            <button class="btn primary" id="btnCopy" disabled>Copy HTML</button>
+            <button class="btn ghost" id="btnDownload" disabled>Download .html</button>
+            <span class="stat" id="reportStat"></span>
+          </div>
+          <div id="warnings"></div>
+        </div>
+
+        <!-- Preview -->
+        <div class="tabpane" id="pane-prev" role="tabpanel" aria-labelledby="tab-prev">
+          <p class="note">Quick structure check only — <strong>not</strong> Healthdirect’s real styling. Use it to confirm headings, bullets, snippets and order are right.</p>
+          <div class="preview" id="previewBox">Convert something to preview it.</div>
+        </div>
+
+        <!-- Link check -->
+        <div class="tabpane" id="pane-links" role="tabpanel" aria-labelledby="tab-links">
+          <div id="staticReport"></div>
+
+          <details class="help" open>
+            <summary>About 404 / 301 checking</summary>
+            <p><strong>The checks above run instantly and need no internet.</strong> They catch your most common fixes: internal links left as full <code>healthdirect.gov.au</code> URLs (which 301-redirect), insecure <code>http://</code>, empty or placeholder links, broken on-page anchors, and external links missing <code>target="_blank"</code>.</p>
+            <p><strong>The live check below fetches every link through a proxy</strong> to find dead links (404) and links that now redirect somewhere else. Each link is checked one at a time with a short wait between requests, and each request times out on its own, so a long list won’t fire all at once or hang.</p>
+          </details>
+
+          <div class="live-box">
+            <div class="row">
+              <button class="btn small" id="btnLive">Run live check on all links</button>
+              <span class="stat" id="liveStat"></span>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <label for="proxyUrl" style="font-size:12px;color:var(--muted);min-width:auto">Proxy</label>
+              <input type="text" id="proxyUrl" value="https://api.allorigins.win/get?url={url}">
+            </div>
+            <p class="note" style="margin:6px 0 0">Default proxy returns the real HTTP status and the final URL after any redirect. The <code>{url}</code> placeholder is replaced with each link. Wait between requests and per-request timeout are set below in the code if you want to change them.</p>
+          </div>
+
+          <div class="scroll" style="margin-top:12px">
+            <table class="links" id="linksTable">
+              <thead><tr><th>Link text</th><th>Link URL</th><th>Resolves to</th><th>Final URL (if redirected)</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   Healthdirect Word → HTML converter
+   Single-file, runs locally. No build step, no dependencies.
+   Extend the SNIPPETS or SLUG_RULES below as Healthdirect patterns grow.
+   ===================================================================== */
+
+/* ---------- Approved CTA snippets (sourced from HD_Editor3.html) ----------
+   Each entry: path + whether it opens in a new tab + icon class + inner <p> HTML.
+   When "relative links" is on, href is the path; otherwise the full domain.   */
+const SNIPPETS = {
+  symptom:        {path:'/symptom-checker', newTab:true,  icon:'dor-icon_user-md',
+                   inner:'<strong>CHECK YOUR SYMPTOMS</strong> — Use the <strong class="cont_underline">Symptom Checker</strong> and find out if you need to seek medical help.'},
+  questionBuilder:{path:'/question-builder', newTab:false, icon:'dor-icon_question',
+                   inner:'<strong>ASK YOUR DOCTOR</strong> — Preparing for an appointment? Use the <strong class="cont_underline">Question Builder</strong> for general tips on what to ask your GP or specialist.'},
+  serviceFinder:  {path:'/australian-health-services', newTab:false, icon:'dor-icon_hospital',
+                   inner:'<strong>FIND A HEALTH SERVICE</strong> — The <strong class="cont_underline">Service Finder</strong> can help you find doctors, pharmacies, hospitals and other health services.'},
+  medicines:      {path:'/medicines', newTab:true, icon:'dor-icon_medicines',
+                   inner:'<strong>LOOKING FOR A MEDICINE?</strong> — To search by brand name or active ingredient, use the <strong class="cont_underline">Medicines information</strong> search feature.'},
+  painPlanner:    {path:'/pain-question-planner', newTab:false, icon:'dor-icon_question',
+                   inner:'<strong>ASK YOUR DOCTOR</strong> — Preparing for an appointment? The <strong class="cont_underline">Pain Question Planner</strong> can help you create a list of questions for your doctor.'},
+  opioid:         {path:'/opioid-risk-indicator', newTab:false, icon:'dor-icon_exclamation',
+                   inner:'<strong>WORRIED ABOUT YOUR OPIOID USE?</strong> — The <strong class="cont_underline">Opioid Risk Indicator</strong> can help you find out if you may be developing a problem.'},
+  bmi:            {path:'/bmi-calculator', newTab:false, icon:'dor-icon_fruit-apple',
+                   inner:'<strong>NEED TO LOSE WEIGHT?</strong> — Use the <strong class="cont_underline">BMI Calculator</strong> to find out if your weight and waist size are in a healthy range.'},
+  vaccination:    {path:'/australian-health-services/all-services/influenza-flu-vaccine/1633181000168107', newTab:false, icon:'dor-icon_syringe',
+                   inner:'<strong>BOOK YOUR VACCINATION</strong> — Use the <strong>Service Finder</strong> to book a Influenza (Flu) vaccination.'}
+};
+
+function buildSnippet(key, relative){
+  const s = SNIPPETS[key];
+  const href = relative ? s.path : ('https://www.healthdirect.gov.au' + s.path);
+  const attrs = s.newTab
+    ? `target="_blank" aria-label="Link opens in a new tab" href="${href}"`
+    : `href="${href}"`;
+  return `<a ${attrs} class="cont_layout-media-object__icon-standout">\n`
+       + `    <i class="cont_layout-media-object__icon-standout-left ${s.icon}"></i>\n`
+       + `    <p class="cont_layout-media-object__icon-standout-right">${s.inner}</p>\n`
+       + `</a>`;
+}
+
+/* Map a CTA paragraph's text -> snippet key. Returns null if not a CTA. */
+function matchCTA(upper){
+  if (upper.startsWith('CHECK YOUR SYMPTOMS'))       return 'symptom';
+  if (upper.startsWith('FIND A HEALTH SERVICE'))     return 'serviceFinder';
+  if (upper.startsWith('LOOKING FOR A MEDICINE'))    return 'medicines';
+  if (upper.startsWith('WORRIED ABOUT YOUR OPIOID')) return 'opioid';
+  if (upper.startsWith('NEED TO LOSE WEIGHT'))       return 'bmi';
+  if (upper.startsWith('BOOK YOUR VACCINATION'))     return 'vaccination';
+  if (upper.startsWith('ASK YOUR DOCTOR'))
+    return upper.includes('PAIN QUESTION PLANNER') ? 'painPlanner' : 'questionBuilder';
+  return null;
+}
+
+const FIGURE_SNIPPET =
+`<figure>
+    <img src="https://media.healthdirect.org.au/images/inline/original/{{insert-file-name}}.jpg" data-hda-inline-image alt="">
+    <figcaption>CAPTION</figcaption>
+</figure>`;
+
+const HELPLINE_HTML =
+`<p>You can also call the healthdirect helpline on <a href="tel:1800022222">1800 022 222</a> (known as NURSE-ON-CALL in Victoria). A registered nurse is available to speak with you 24 hours a day, 7 days a week.</p>`;
+
+/* Warning / alert call-out box for paragraphs marked "[CTA] …". The inner
+   HTML (with the "[CTA] " marker already stripped) is placed inside, in bold. */
+function buildAlert(innerHtml){
+  return '<div class="cont_layout-container">\n'
+       + '    <div class="cont_layout-media-object">\n'
+       + '        <div class="cont_layout-media-object-left">\n'
+       + '            <i class="dor-icon_warning" style="color:#e25553; font-size: 36px;"></i>\n'
+       + '        </div>\n'
+       + '        <div class="cont_layout-media-object-right">\n'
+       + '            <p><strong>' + innerHtml + '</strong></p>\n'
+       + '        </div>\n'
+       + '    </div>\n'
+       + '</div>';
+}
+
+/* Clean a "Source references" table: plain text only (links and other tags
+   removed), no stray line breaks or double spaces, and exactly 3 columns.
+   Empty columns and empty rows are dropped; a <th> header row is preserved. */
+function cleanReferencesTable(html){
+  const d = new DOMParser().parseFromString(html, 'text/html');
+  const table = d.querySelector('table');
+  if (!table) return html;
+
+  const cellText = cell => {
+    const clone = cell.cloneNode(true);
+    clone.querySelectorAll('br').forEach(br => br.replaceWith(cell.ownerDocument.createTextNode(' ')));
+    return straightenQuotes(norm(clone.textContent));
+  };
+
+  const rawRows = Array.from(table.querySelectorAll('tr')).map(tr => {
+    const cells = Array.from(tr.children).filter(c => /^(td|th)$/i.test(c.tagName));
+    return { vals: cells.map(cellText), head: cells.length > 0 && cells.every(c => c.tagName.toLowerCase() === 'th') };
+  }).filter(r => r.vals.length);
+
+  if (!rawRows.length) return html;
+
+  // Drop columns that are empty in every row.
+  const maxCols = Math.max(...rawRows.map(r => r.vals.length));
+  const keep = [];
+  for (let c = 0; c < maxCols; c++){
+    if (rawRows.some(r => (r.vals[c] || '').trim() !== '')) keep.push(c);
+  }
+  let rows = rawRows.map(r => ({ head: r.head, vals: keep.map(c => r.vals[c] || '') }))
+                    .filter(r => r.vals.some(v => v.trim() !== ''));
+
+  // Enforce exactly 3 columns.
+  rows.forEach(r => { if (r.vals.length > 3) r.vals = r.vals.slice(0, 3); while (r.vals.length < 3) r.vals.push(''); });
+
+  let out = '<table>\n';
+  let bodyRows = rows;
+  if (rows.length && rows[0].head){
+    out += '    <thead>\n        <tr>' + rows[0].vals.map(v => `<th>${esc(v)}</th>`).join('') + '</tr>\n    </thead>\n';
+    bodyRows = rows.slice(1);
+  }
+  out += '    <tbody>\n';
+  bodyRows.forEach(r => { out += '        <tr>' + r.vals.map(v => `<td>${esc(v)}</td>`).join('') + '</tr>\n'; });
+  out += '    </tbody>\n</table>';
+  return out;
+}
+
+/* ---------- Heading -> id slug rules (Healthdirect standard) ---------- */
+const SLUG_RULES = [
+  [/^what is\b/i,                  'what-is'],
+  [/^what are the types\b/i,       'types'],
+  [/^what are the symptoms\b/i,    'symptoms'],
+  [/^what causes\b/i,              'causes'],
+  [/^when should i see\b/i,        'doctor'],
+  [/\bbe screened\b/i,             'screened'],
+  [/\bdiagnos/i,                   'diagnosed'],
+  [/\btreated\b/i,                 'treated'],
+  [/^living with\b/i,              'live-with'],
+  [/^what are the complications\b/i,'complications'],
+  [/\bbe prevented\b/i,            'prevented'],
+  [/^resources and support\b/i,    'resources'],
+];
+function slugFor(text){
+  for (const [re, slug] of SLUG_RULES) if (re.test(text)) return slug;
+  return text.toLowerCase().replace(/&[a-z]+;/g,' ')
+             .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40) || 'section';
+}
+
+/* ---------- small helpers ---------- */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escAttr = s => s.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+const norm = s => (s||'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
+
+/* Curly "smart" quotes -> straight quotes (Healthdirect house style).
+   Toggled per run from the "Straighten smart quotes" option. Dashes,
+   ellipses and other punctuation are left untouched. */
+let NORMALIZE_QUOTES = true;
+const straightenQuotes = s => NORMALIZE_QUOTES
+  ? s.replace(/[\u2018\u2019\u201A\u201B]/g, "'").replace(/[\u201C\u201D\u201E\u201F]/g, '"')
+  : s;
+
+/* Classify a link and (optionally) rewrite internal ones to relative. */
+function normalizeLink(rawHref, relative){
+  let href = (rawHref||'').trim();
+  if (!href || href === '#') return {kind:'empty', href};
+  if (href.startsWith('#'))           return {kind:'anchor', href};
+  if (/^tel:/i.test(href))            return {kind:'tel',    href};
+  if (/^mailto:/i.test(href))         return {kind:'mailto', href};
+  const hd = href.match(/^https?:\/\/(?:www\.)?healthdirect\.gov\.au(\/[^\s]*|\/?$)/i);
+  if (hd){ const path = hd[1] && hd[1] !== '/' ? hd[1] : '/'; return {kind:'internal', href: relative ? path : href}; }
+  if (href.startsWith('/'))           return {kind:'internal', href};
+  if (/^https?:\/\//i.test(href))     return {kind:'external', href};
+  return {kind:'external', href}; // relative-ish / unknown -> treat as external-ish, flag later
+}
+
+/* Render an <a>, applying the target/aria rule. */
+function renderAnchor(rawHref, innerHtml, relative){
+  const L = normalizeLink(rawHref, relative);
+  const safe = escAttr(L.href);
+  if (L.kind === 'external')
+    return `<a target="_blank" aria-label="Link opens in a new tab" href="${safe}">${innerHtml}</a>`;
+  return `<a href="${safe}">${innerHtml}</a>`;
+}
+
+/* Recursively clean inline content, keeping only safe tags + links. */
+function cleanInline(node, relative){
+  let out = '';
+  node.childNodes.forEach(ch => {
+    if (ch.nodeType === 3){ out += esc(straightenQuotes(ch.nodeValue.replace(/\u00a0/g,' '))); return; }
+    if (ch.nodeType !== 1) return;
+    const tag = ch.tagName.toLowerCase();
+    const inner = cleanInline(ch, relative);
+    if (tag === 'a'){ out += renderAnchor(ch.getAttribute('href')||'', inner, relative); }
+    else if (tag === 'strong' || tag === 'b'){ out += inner.trim() ? `<strong>${inner}</strong>` : ''; }
+    else if (tag === 'em' || tag === 'i'){ out += inner.trim() ? `<em>${inner}</em>` : ''; }
+    else if (tag === 'sup'){ out += `<sup>${inner}</sup>`; }
+    else if (tag === 'sub'){ out += `<sub>${inner}</sub>`; }
+    else if (tag === 'br'){ out += '<br>'; }
+    else { out += inner; } // span, font, u, etc. -> unwrap
+  });
+  return out;
+}
+
+/* ---------- core conversion ---------- */
+function convert(rawHtml, opt){
+  const warnings = [];
+  NORMALIZE_QUOTES = opt.quotes !== false;
+  const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
+
+  // Idempotency: if the input already contains a built standout/nav, don't double-wrap.
+  const alreadyStandout = !!doc.querySelector('.cont_layout-standout');
+  const alreadyNav = !!doc.querySelector('.cont_nav-index-table__double-col');
+
+  // Strip Word junk that DOMParser kept.
+  doc.querySelectorAll('o\\:p, style, script, xml, meta, link, title').forEach(n => n.remove());
+
+  // Gather block-level elements in document order.
+  const root = doc.body;
+  const blocks = [];
+  function isHeadingClass(cls){ const m = (cls||'').match(/h([123])/i); return m ? +m[1] : 0; }
+
+  function walk(parent){
+    Array.from(parent.children).forEach(el => {
+      const tag = el.tagName.toLowerCase();
+      const cls = el.getAttribute('class') || '';
+      const style = el.getAttribute('style') || '';
+      if (tag === 'ul' || tag === 'ol'){
+        Array.from(el.querySelectorAll(':scope > li')).forEach(li => {
+          blocks.push({kind:'li', html: cleanInline(li, opt.relative), text: norm(li.textContent)});
+        });
+        return;
+      }
+      if (/^h[1-6]$/.test(tag)){
+        let lvl = +tag[1]; if (lvl > 3) lvl = 3;
+        blocks.push({kind:'h', level:lvl, html: cleanInline(el, opt.relative), text: norm(el.textContent), cls});
+        return;
+      }
+      if (tag === 'p' || tag === 'div'){
+        // A <div> may just wrap paragraphs (Word/段) — recurse if it has element children but little direct text.
+        const directText = Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.nodeValue).join('').trim();
+        if (tag === 'div' && el.children.length && !directText){ walk(el); return; }
+        const text = norm(el.textContent);
+        const headingLevel = isHeadingClass(cls);
+        const isBullet = /bullet|listparagraph/i.test(cls) || /mso-list/i.test(style) || /^[•·●▪◦\-]\s+/.test(text);
+        if (!text){ return; } // drop empty paragraphs
+        if (headingLevel){ blocks.push({kind:'h', level:headingLevel, html: cleanInline(el, opt.relative), text, cls}); return; }
+        if (isBullet){
+          let html = cleanInline(el, opt.relative).replace(/^\s*[•·●▪◦\-]\s+/,'');
+          blocks.push({kind:'li', html, text: text.replace(/^\s*[•·●▪◦\-]\s+/,'')});
+          return;
+        }
+        blocks.push({kind:'p', html: cleanInline(el, opt.relative), text});
+        return;
+      }
+      if (tag === 'table' || tag === 'figure' || tag === 'blockquote' || tag === 'img' || tag === 'a' || tag === 'nav'){
+        blocks.push({kind:'raw', html: el.outerHTML, text: norm(el.textContent)});
+        return;
+      }
+      // unknown container -> recurse
+      if (el.children.length){ walk(el); }
+    });
+  }
+  walk(root);
+
+  // Remove literal "[H1]"–"[H6]" authoring markers wherever they appear in
+  // headings, paragraphs or bullets. (These are never real content, and they
+  // can show up mid-text or on paragraphs Word didn't tag as a heading.)
+  blocks.forEach(b => {
+    if (b.kind === 'h' || b.kind === 'p' || b.kind === 'li'){
+      if (b.text != null) b.text = b.text.replace(/\[H[1-6]\]/gi, '').replace(/\s{2,}/g, ' ').trim();
+      if (b.html != null) b.html = b.html.replace(/\[H[1-6]\]/gi, '').replace(/\s{2,}/g, ' ').replace(/^\s+|\s+$/g, '');
+    }
+  });
+
+  // Heading guards: demote things that are styled as a heading but are
+  // really body text. A genuine section heading is short and is never a
+  // lead-in sentence ending in a colon (e.g. "You can reduce your risk by
+  // making the following choices:").
+  blocks.forEach(b => {
+    if (b.kind !== 'h') return;
+    if (b.text.length > 120){ b.kind = 'p'; return; }      // very long -> body text
+    if (/:\s*$/.test(b.text)){ b.kind = 'p'; }             // lead-in sentence -> body text
+  });
+
+  // Replace CTA paragraphs, image placeholders, helpline paragraph, and
+  // flag any leftover [[ ... ]] editorial instructions from the writers.
+  blocks.forEach(b => {
+    if (b.kind !== 'p') return;
+    const U = b.text.toUpperCase();
+    // Clean image placeholder, e.g. [IMAGE] or [[IMAGE]] -> figure scaffold (no warning).
+    if (opt.images && /^\[+\s*image\s*\]+$/i.test(b.text)){ b.kind = 'figure'; b.html = FIGURE_SNIPPET; return; }
+    // A paragraph marked "[CTA] …" becomes the warning/alert callout box.
+    if (/^\s*\[CTA\]/i.test(b.text)){
+      const inner = b.html.replace(/^\s*\[CTA\]\s*/i, '').trim();
+      b.kind = 'cta'; b.html = buildAlert(inner);
+      return;
+    }
+    const cta = matchCTA(U);
+    if (cta){ b.kind = 'cta'; b.html = buildSnippet(cta, opt.relative); return; }
+    if (U.includes('HEALTHDIRECT HELPLINE') && U.replace(/\s/g,'').includes('1800022222')){ b.kind = 'helpline'; b.html = HELPLINE_HTML; return; }
+    // A paragraph wrapped entirely in [[ ... ]] is an unactioned writer instruction.
+    if (/^\[\[[\s\S]*\]\]$/.test(b.text)){
+      const instr = b.text.replace(/^\[\[\s*|\s*\]\]$/g,'');
+      if (opt.images && /\b(image|images|figure|diagram|illustration|picture|photo|graphic|map|table)\b/i.test(instr)){
+        b.kind = 'figure'; b.html = FIGURE_SNIPPET;
+        warnings.push(['warn', `Found an editorial instruction and inserted an image placeholder in its place — add the correct image. Instruction was: “${instr}”`]);
+      } else {
+        b.kind = 'drop';
+        warnings.push(['warn', `Removed an unactioned editorial instruction from the content. Please check it was handled. Instruction was: “${instr}”`]);
+      }
+    }
+  });
+
+  // Group consecutive <li> into <ul>.
+  const grouped = [];
+  for (let i=0;i<blocks.length;i++){
+    if (blocks[i].kind === 'drop'){ continue; }   // removed editorial instruction
+    if (blocks[i].kind === 'li'){
+      const items = [];
+      while (i<blocks.length && blocks[i].kind === 'li'){ items.push(blocks[i].html); i++; }
+      i--; grouped.push({kind:'ul', items});
+    } else grouped.push(blocks[i]);
+  }
+
+  // Sections handled specially:
+  //  • "Meta description" / SEO metadata — a working-document field. Dropped
+  //    entirely so it never appears in the body or the "On this page" nav.
+  //  • "Source references" — reference apparatus. Kept in the body but never
+  //    listed in the nav; its table is cleaned to 3 plain-text columns.
+  const META_RE = /^(meta\s*description|meta\s*data|metadata|page\s*description|seo(\s*description)?)\s*$/i;
+  const REF_RE  = /^(sources?|references|source references?|reference list)\s*$/i;
+
+  // 1) Drop meta-description sections (heading + everything under it).
+  const pruned = [];
+  let dropLevel = 0;
+  for (const b of grouped){
+    if (dropLevel){
+      if (b.kind === 'h' && b.level <= dropLevel){ dropLevel = 0; }
+      else continue;
+    }
+    if (b.kind === 'h' && META_RE.test(b.text)){ dropLevel = b.level; continue; }
+    pruned.push(b);
+  }
+
+  // 2) In each "Source references" section: clean any table, mark the heading
+  //    so it is kept out of the nav, and note whether the section has content.
+  for (let i=0;i<pruned.length;i++){
+    const b = pruned[i];
+    if (!(b.kind === 'h' && REF_RE.test(b.text))) continue;
+    b.isRef = true;
+    let hasContent = false;
+    for (let j=i+1;j<pruned.length;j++){
+      const nb = pruned[j];
+      if (nb.kind === 'h' && nb.level <= b.level) break;     // end of this section
+      if (nb.kind === 'raw' && /^<table/i.test((nb.html||'').trim())){
+        nb.html = cleanReferencesTable(nb.html);
+      }
+      hasContent = true;
+    }
+    b.refEmpty = !hasContent;   // a lone references heading with nothing under it
+  }
+
+  // Pull out the Key facts block; remove ALL H1 elements (the CMS supplies the
+  // page title). The first H1 is remembered only for the on-screen stats.
+  let titleText = '';
+  let keyFacts = null;            // {items:[]}
+  const body = [];
+
+  for (let i=0;i<pruned.length;i++){
+    const b = pruned[i];
+    if (b.kind === 'h' && b.level === 1){      // drop every H1, always
+      if (!titleText) titleText = b.text;
+      continue;
+    }
+    if (b.isRef && b.refEmpty){ continue; }     // lone "Source references" heading, nothing under it
+    if (opt.keyFacts && !alreadyStandout && b.kind === 'h' && /^key facts$/i.test(b.text)){
+      // next block should be the bullet list
+      const next = pruned[i+1];
+      if (next && next.kind === 'ul'){ keyFacts = {items: next.items}; i++; }
+      else { keyFacts = {items: []}; warnings.push(['warn','“Key facts” heading found but no bullet list followed it.']); }
+      continue;
+    }
+    body.push(b);
+  }
+
+  // Assign ids to H2s and build the nav from them. "Source references" headings
+  // are kept in the body but never listed in the nav.
+  const navItems = [];
+  const usedIds = {};
+  body.forEach(b => {
+    if (b.kind === 'h' && b.level === 2 && !b.isRef){
+      let id = slugFor(b.text);
+      if (usedIds[id]){ usedIds[id]++; const n = id + '-' + usedIds[id]; warnings.push(['warn',`Two headings map to id “${id}”. Second one set to “${n}” — check this.`]); id = n; }
+      else usedIds[id] = 1;
+      b.id = id;
+      navItems.push({id, text: straightenQuotes(b.text)});
+    }
+  });
+
+  // ---- assemble fragment ----
+  const parts = [];
+  if (keyFacts){
+    parts.push('<div class="cont_layout-standout">');
+    parts.push('    <h2>Key facts</h2>');
+    parts.push('    <ul>');
+    keyFacts.items.forEach(it => parts.push('        <li>' + it + '</li>'));
+    parts.push('    </ul>');
+    parts.push('</div>');
+  }
+  if (opt.nav && !alreadyNav && navItems.length){
+    parts.push('<nav class="cont_nav-index-table__double-col">');
+    parts.push('    <h2>On this page</h2>');
+    parts.push('    <ul>');
+    navItems.forEach(n => parts.push(`        <li><a href="#${n.id}">${esc(n.text)}</a></li>`));
+    parts.push('        <li><a href="#searchGeneralResults">Related information on Australian websites</a></li>');
+    parts.push('    </ul>');
+    parts.push('</nav>');
+  }
+
+  // body
+  let first = true;
+  body.forEach(b => {
+    if (b.kind === 'h'){
+      parts.push('');
+      if (b.level === 2 && b.id) parts.push(`<h2 id="${b.id}">${b.html}</h2>`);
+      else parts.push(`<h${b.level}>${b.html}</h${b.level}>`);
+    } else if (b.kind === 'p'){
+      parts.push('<p>' + b.html + '</p>');
+    } else if (b.kind === 'ul'){
+      parts.push('<ul>');
+      b.items.forEach(it => parts.push('    <li>' + it + '</li>'));
+      parts.push('</ul>');
+    } else if (b.kind === 'cta' || b.kind === 'figure' || b.kind === 'helpline' || b.kind === 'raw'){
+      parts.push(b.html);
+    }
+  });
+
+  let html = parts.join('\n').replace(/\n{3,}/g,'\n\n').replace(/^\n+/,'').trimEnd() + '\n';
+
+  const stats = {
+    headings: body.filter(b=>b.kind==='h').length,
+    paras: body.filter(b=>b.kind==='p').length,
+    ctas: body.filter(b=>b.kind==='cta').length,
+    keyFacts: keyFacts ? keyFacts.items.length : 0,
+    nav: navItems.length
+  };
+
+  return {html, warnings, stats, titleText};
+}
+
+/* ---------- link extraction + static validation ---------- */
+function analyseLinks(html){
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const ids = new Set(Array.from(doc.querySelectorAll('[id]')).map(e=>e.id));
+  const issues = [];
+  const rows = [];
+  const seenText = {};
+
+  doc.querySelectorAll('a[href]').forEach(a => {
+    const href = a.getAttribute('href') || '';
+    const text = norm(a.textContent) || '(no text)';
+    const hasTarget = a.getAttribute('target') === '_blank';
+    const L = normalizeLink(href, false); // classify only
+
+    let type = L.kind, abs = href, resolves = true;
+    if (L.kind === 'internal'){
+      abs = href.startsWith('/') ? 'https://www.healthdirect.gov.au' + href : href;
+    }
+
+    // checks
+    if (L.kind === 'empty'){ issues.push(['err', text, 'Empty or placeholder link', href]); resolves=false; }
+    if (/\{\{|\}\}/.test(href)){ issues.push(['err', text, 'Unfinished placeholder in URL', href]); resolves=false; }
+    if (/^https?:\/\/(?:www\.)?healthdirect\.gov\.au/i.test(href)){ issues.push(['warn', text, 'Internal link uses full domain → will 301. Make it relative.', href]); }
+    if (/^http:\/\//i.test(href)){ issues.push(['warn', text, 'Insecure http:// link', href]); }
+    if (/\s/.test(href.trim()) && !href.startsWith('#')){ issues.push(['warn', text, 'URL contains a space', href]); }
+    if (L.kind === 'anchor'){ const target = href.slice(1); if (target && !ids.has(target) && target !== 'searchGeneralResults'){ issues.push(['err', text, 'On-page anchor has no matching id', href]); resolves=false; } }
+    if (L.kind === 'external' && !hasTarget){ issues.push(['warn', text, 'External link missing target="_blank" / aria-label', href]); }
+    if ((L.kind === 'internal' || L.kind === 'tel') && hasTarget){ issues.push(['warn', text, 'Internal/tel link should not open in a new tab', href]); }
+    // duplicate text -> different URL
+    const key = text.toLowerCase();
+    if (seenText[key] && seenText[key] !== href){ issues.push(['info', text, 'Same link text points to a different URL elsewhere', href]); }
+    seenText[key] = href;
+
+    rows.push({text, href, abs, type, resolves});
+  });
+
+  // de-dupe rows by href for the table
+  const uniq = []; const seen = new Set();
+  rows.forEach(r => { if (!seen.has(r.href)){ seen.add(r.href); uniq.push(r); } });
+
+  return {issues, rows: uniq, total: rows.length};
+}
+
+/* =====================================================================
+   UI wiring
+   ===================================================================== */
+const $ = sel => document.querySelector(sel);
+let lastWordPaste = null;   // raw text/html captured from the last Word paste
+let currentHtml = '';
+let currentLinks = null;
+
+function opts(){
+  return {
+    relative: $('#optRelative').checked,
+    nav:      $('#optNav').checked,
+    keyFacts: $('#optKeyFacts').checked,
+    images:   $('#optImages').checked,
+    quotes:   $('#optQuotes').checked,
+  };
+}
+
+/* tabs */
+function wireTabs(ids){
+  const btns = ids.map(id => $('#'+id));
+  btns.forEach(btn => btn.addEventListener('click', () => {
+    btns.forEach(b => {
+      const sel = b === btn;
+      b.setAttribute('aria-selected', sel ? 'true':'false');
+      $('#'+b.getAttribute('aria-controls')).classList.toggle('active', sel);
+    });
+  }));
+}
+wireTabs(['tab-word','tab-html']);
+wireTabs(['tab-out','tab-prev','tab-links']);
+
+/* capture raw Word HTML on paste (preserves Word's style classes) */
+const wordEditor = $('#wordEditor');
+wordEditor.addEventListener('paste', e => {
+  const cd = e.clipboardData;
+  if (!cd) return;
+  const html = cd.getData('text/html');
+  const txt = cd.getData('text/plain');
+  if (html){
+    e.preventDefault();
+    lastWordPaste = html;
+    // show a readable version (browser will sanitise for display only)
+    wordEditor.innerHTML = html;
+    updateInputStat();
+  } else if (txt){
+    lastWordPaste = null; // plain text path uses innerText
+  }
+});
+wordEditor.addEventListener('input', () => { lastWordPaste = null; updateInputStat(); });
+$('#htmlInput').addEventListener('input', updateInputStat);
+
+function updateInputStat(){
+  const wordActive = $('#tab-word').getAttribute('aria-selected') === 'true';
+  const len = wordActive ? (lastWordPaste || wordEditor.innerText).length : $('#htmlInput').value.length;
+  $('#inputStat').textContent = len ? (len.toLocaleString() + ' chars in') : '';
+}
+
+function getInput(){
+  const wordActive = $('#tab-word').getAttribute('aria-selected') === 'true';
+  if (wordActive){
+    if (lastWordPaste) return lastWordPaste;
+    // fall back to whatever is in the editor (may be plain text)
+    return wordEditor.innerHTML.trim() || ('<p>' + esc(wordEditor.innerText) + '</p>');
+  }
+  return $('#htmlInput').value;
+}
+
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* render the static link report */
+function renderStaticReport(analysis){
+  const box = $('#staticReport');
+  if (!analysis.total){ box.innerHTML = '<p class="note">No links found.</p>'; return; }
+  const errs = analysis.issues.filter(i=>i[0]==='err');
+  const warns = analysis.issues.filter(i=>i[0]==='warn');
+  const infos = analysis.issues.filter(i=>i[0]==='info');
+  let head = `<p class="note">${analysis.total} link${analysis.total>1?'s':''} found `;
+  head += `<span class="badge err">${errs.length} errors</span> `;
+  head += `<span class="badge warn">${warns.length} warnings</span> `;
+  head += `<span class="badge info">${infos.length} notes</span></p>`;
+  let list = '';
+  if (analysis.issues.length){
+    list = '<ul class="report">';
+    analysis.issues.forEach(([lvl, text, what, href]) => {
+      const b = lvl==='err'?'err':lvl==='warn'?'warn':'info';
+      list += `<li><span class="badge ${b}">${lvl}</span> <span class="what">${esc(what)}</span><br>`
+            + `“${esc(text)}” → <code>${esc(href)}</code></li>`;
+    });
+    list += '</ul>';
+  } else {
+    list = '<p class="note"><span class="badge ok">clean</span> No static issues detected.</p>';
+  }
+  box.innerHTML = head + list;
+}
+
+function renderLinksTable(rows){
+  const tb = $('#linksTable').querySelector('tbody');
+  tb.innerHTML = '';
+  rows.forEach(r => {
+    const checkable = /^https?:\/\//i.test(r.abs) || r.abs.startsWith('/');
+    const absUrl = /^https?:/i.test(r.abs)
+      ? r.abs
+      : (r.abs.startsWith('/') ? 'https://www.healthdirect.gov.au' + r.abs : r.abs);
+    const urlCell = checkable
+      ? `<a href="${escAttr(absUrl)}" target="_blank" rel="noopener">${esc(r.href)}</a>`
+      : esc(r.href);
+    const tr = document.createElement('tr');
+    if (checkable) tr.dataset.abs = absUrl;
+    tr.innerHTML =
+        `<td>${esc(r.text)}</td>`
+      + `<td class="url">${urlCell}</td>`
+      + `<td class="resolveCell">${checkable ? '<span class="muted">not checked</span>' : '<span class="muted">n/a</span>'}</td>`
+      + `<td class="finalCell"><span class="muted">—</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* run conversion */
+function runConvert(){
+  const input = getInput();
+  if (!input.trim()){ toast('Paste some content first'); return; }
+  const res = convert(input, opts());
+  currentHtml = res.html;
+
+  // output
+  $('#outCode').textContent = res.html;
+  $('#btnCopy').disabled = false;
+  $('#btnDownload').disabled = false;
+
+  // warnings
+  const w = $('#warnings');
+  if (res.warnings.length){
+    w.innerHTML = '<ul class="report" style="margin-top:12px">' +
+      res.warnings.map(([lvl,msg]) => `<li><span class="badge ${lvl==='warn'?'warn':'info'}">${lvl}</span> ${esc(msg)}</li>`).join('') +
+      '</ul>';
+  } else w.innerHTML = '';
+
+  // stats
+  const s = res.stats;
+  $('#reportStat').textContent =
+    `${s.headings} headings · ${s.paras} paragraphs · ${s.ctas} CTA snippet${s.ctas!==1?'s':''} · ${s.keyFacts} key facts`;
+
+  // preview
+  $('#previewBox').innerHTML = res.html || 'Nothing to preview.';
+
+  // links
+  currentLinks = analyseLinks(res.html);
+  renderStaticReport(currentLinks);
+  renderLinksTable(currentLinks.rows);
+  const lc = $('#linkCount');
+  const errCount = currentLinks.issues.filter(i=>i[0]==='err').length;
+  const warnCount = currentLinks.issues.filter(i=>i[0]==='warn').length;
+  lc.style.display = '';
+  lc.className = 'badge ' + (errCount ? 'err' : warnCount ? 'warn' : 'ok');
+  lc.textContent = errCount ? (errCount+' err') : warnCount ? (warnCount+' warn') : 'ok';
+
+  toast('Converted');
+}
+
+$('#btnConvert').addEventListener('click', runConvert);
+
+$('#btnCopy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(currentHtml); toast('HTML copied'); }
+  catch { const t=$('#outCode'); const r=document.createRange(); r.selectNodeContents(t);
+          const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Selected — press Ctrl/Cmd+C'); }
+});
+
+$('#btnDownload').addEventListener('click', () => {
+  const name = (currentLinks && '') || 'healthdirect-content';
+  const blob = new Blob([currentHtml], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = (prompt('Filename:', 'content.html') || 'content.html');
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+});
+
+$('#btnClear').addEventListener('click', () => {
+  wordEditor.innerHTML = ''; $('#htmlInput').value = ''; lastWordPaste = null;
+  currentHtml = ''; currentLinks = null;
+  $('#outCode').textContent = 'Your converted HTML will appear here.';
+  $('#previewBox').textContent = 'Convert something to preview it.';
+  $('#staticReport').innerHTML = ''; $('#linksTable').querySelector('tbody').innerHTML = '';
+  $('#warnings').innerHTML=''; $('#reportStat').textContent=''; $('#inputStat').textContent='';
+  $('#btnCopy').disabled = true; $('#btnDownload').disabled = true; $('#linkCount').style.display='none';
+  toast('Cleared');
+});
+
+/* sample mimics Word's pasted HTML (style classes + a CTA + image placeholder) */
+$('#btnSample').addEventListener('click', () => {
+  $('#tab-html').click();
+  $('#htmlInput').value =
+`<p class="HLDH1">Example cancer</p>
+<p class="HLDH2">Key facts</p>
+<p class="CMRBulletPoints">Example cancer happens when abnormal cells grow in an uncontrolled way.</p>
+<p class="CMRBulletPoints">The most common symptom is unexplained pain.</p>
+<p class="HLDH2">What is example cancer?</p>
+<p class="Normaltext">Example cancer develops in the body's tissues. Read more about <a href="https://www.healthdirect.gov.au/cancer">cancer</a>.</p>
+<p class="Normaltext">[[IMAGE]]</p>
+<p class="HLDH2">What are the symptoms of example cancer?</p>
+<p class="Normaltext">Symptoms may include:</p>
+<p class="CMRBulletPoints">pain that doesn't go away</p>
+<p class="CMRBulletPoints">unexplained tiredness (<a href="https://www.healthdirect.gov.au/fatigue">fatigue</a>)</p>
+<p class="Normaltext">CHECK YOUR SYMPTOMS — Use the Symptom Checker and find out if you need to seek medical help.</p>
+<p class="HLDH2">When should I see my doctor?</p>
+<p class="Normaltext">See your doctor if symptoms persist.</p>
+<p class="Normaltext">ASK YOUR DOCTOR — Preparing for an appointment? Use the Question Builder for general tips on what to ask your GP or specialist.</p>
+<p class="HLDH2">Resources and support</p>
+<p class="Normaltext">For more support, contact <a href="https://www.cancer.org.au/">Cancer Council Australia</a>.</p>`;
+  updateInputStat();
+  toast('Sample loaded — click Convert');
+});
+
+/* ---------- live link check (via proxy) ----------
+   Tune these two values if you want faster/slower checking. */
+const LIVE_WAIT_MS    = 1000;    // pause between requests so we don't fire all at once
+const LIVE_TIMEOUT_MS = 12000;   // give up on any single request after this long
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function fetchWithTimeout(url, ms){
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(t));
+}
+const STATUS_TEXT = {200:'OK',201:'Created',204:'No content',301:'Moved permanently',302:'Found',303:'See other',307:'Temporary redirect',308:'Permanent redirect',400:'Bad request',401:'Unauthorised',403:'Forbidden',404:'Not found',410:'Gone',429:'Too many requests',500:'Server error',502:'Bad gateway',503:'Unavailable',504:'Gateway timeout'};
+const statusLabel = c => c + (STATUS_TEXT[c] ? ' ' + STATUS_TEXT[c] : '');
+// True if the final URL is meaningfully different from what we requested (a redirect).
+function isRedirect(requested, finalUrl){
+  if (!finalUrl) return false;
+  const tidy = u => u.replace(/\/+$/,'').toLowerCase();
+  return tidy(requested) !== tidy(finalUrl);
+}
+
+$('#btnLive').addEventListener('click', async () => {
+  if (!currentLinks || !currentLinks.rows.length){ toast('Convert something first'); return; }
+  const proxy = $('#proxyUrl').value.trim();
+  if (!proxy.includes('{url}')){ toast('Proxy URL must contain {url}'); return; }
+
+  const btn = $('#btnLive');
+  const trs = Array.from(document.querySelectorAll('#linksTable tbody tr'));
+  const jobs = currentLinks.rows
+    .map((r, i) => ({ r, tr: trs[i] }))
+    .filter(j => j.tr && j.tr.dataset.abs);   // only checkable http(s)/relative links
+
+  if (!jobs.length){ toast('No checkable links (anchors and tel: links are skipped)'); return; }
+
+  btn.disabled = true;
+  let done = 0;
+  for (const { tr } of jobs){
+    const target = tr.dataset.abs;
+    const resCell = tr.querySelector('.resolveCell');
+    const finCell = tr.querySelector('.finalCell');
+    resCell.innerHTML = '<span class="muted">checking…</span>';
+    $('#liveStat').textContent = `Checking ${done + 1} of ${jobs.length}…`;
+
+    try {
+      const resp = await fetchWithTimeout(proxy.replace('{url}', encodeURIComponent(target)), LIVE_TIMEOUT_MS);
+      let code = resp.status, finalUrl = '';
+      // allorigins /get?url= returns JSON: { status: { http_code, url } }
+      try {
+        const j = await resp.clone().json();
+        if (j && j.status){
+          if (j.status.http_code) code = j.status.http_code;
+          if (j.status.url) finalUrl = j.status.url;
+        }
+      } catch { /* non-JSON proxy: fall back to the proxy's own status */ }
+
+      let cls = 'ok';
+      if (code === 0){ cls = 'err'; }
+      else if (code >= 400){ cls = 'err'; }
+      else if (code >= 300){ cls = 'warn'; }
+      resCell.innerHTML = `<span class="badge ${cls}">${code ? esc(statusLabel(code)) : 'no response'}</span>`;
+
+      if (isRedirect(target, finalUrl)){
+        finCell.innerHTML = `<a href="${escAttr(finalUrl)}" target="_blank" rel="noopener">${esc(finalUrl)}</a>`;
+        if (cls === 'ok') resCell.innerHTML = `<span class="badge warn">${esc(statusLabel(code))} · redirected</span>`;
+      } else {
+        finCell.innerHTML = '<span class="muted">—</span>';
+      }
+    } catch (err){
+      const aborted = err && err.name === 'AbortError';
+      resCell.innerHTML = `<span class="badge err">${aborted ? 'timed out' : 'could not check'}</span>`;
+      finCell.innerHTML = '<span class="muted">—</span>';
+    }
+
+    done++;
+    $('#liveStat').textContent = `Checked ${done} of ${jobs.length}`;
+    if (done < jobs.length) await sleep(LIVE_WAIT_MS);   // space out requests
+  }
+  $('#liveStat').textContent = `Done — checked ${jobs.length} link${jobs.length !== 1 ? 's' : ''}.`;
+  btn.disabled = false;
+});
+
+</script>
+</body>
+</html>
