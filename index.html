@@ -454,7 +454,13 @@ function normalizeLink(rawHref, relative){
 
 /* Render an <a>, applying the target/aria rule. */
 function renderAnchor(rawHref, innerHtml, relative){
-  const L = normalizeLink(rawHref, relative);
+  const raw = (rawHref || '').trim();
+  // An anchor with no usable destination (empty href, or a bare "#") is not a
+  // real link — Word leaves these behind from bookmarks and fields. Unwrap it,
+  // keeping only its inner content.
+  if (!raw || raw === '#'){ return innerHtml; }
+  const L = normalizeLink(raw, relative);
+  if (!L.href || L.href === '#'){ return innerHtml; }
   const safe = escAttr(L.href);
   if (L.kind === 'external')
     return `<a target="_blank" aria-label="Link opens in a new tab" href="${safe}">${innerHtml}</a>`;
@@ -465,19 +471,24 @@ function renderAnchor(rawHref, innerHtml, relative){
 function cleanInline(node, relative){
   let out = '';
   node.childNodes.forEach(ch => {
-    if (ch.nodeType === 3){ out += esc(straightenQuotes(ch.nodeValue.replace(/\u00a0/g,' '))); return; }
+    if (ch.nodeType === 3){ out += esc(straightenQuotes(ch.nodeValue.replace(/\u00a0/g,' ').replace(/\s+/g,' '))); return; }
     if (ch.nodeType !== 1) return;
     const tag = ch.tagName.toLowerCase();
     const inner = cleanInline(ch, relative);
     if (tag === 'a'){ out += renderAnchor(ch.getAttribute('href')||'', inner, relative); }
-    else if (tag === 'strong' || tag === 'b'){ out += inner.trim() ? `<strong>${inner}</strong>` : ''; }
-    else if (tag === 'em' || tag === 'i'){ out += inner.trim() ? `<em>${inner}</em>` : ''; }
+    // A bold/italic run containing only whitespace must still contribute that
+    // whitespace (Word often splits a space into its own bold run); dropping it
+    // would fuse adjacent words together.
+    else if (tag === 'strong' || tag === 'b'){ out += inner.trim() ? `<strong>${inner}</strong>` : inner; }
+    else if (tag === 'em' || tag === 'i'){ out += inner.trim() ? `<em>${inner}</em>` : inner; }
     else if (tag === 'sup'){ out += `<sup>${inner}</sup>`; }
     else if (tag === 'sub'){ out += `<sub>${inner}</sub>`; }
     else if (tag === 'br'){ out += '<br>'; }
     else { out += inner; } // span, font, u, etc. -> unwrap
   });
-  return out;
+  // Merge adjacent identical emphasis runs (Word fragments bold/italic text into
+  // many runs); whitespace between the tags is preserved so words stay separated.
+  return out.replace(/<\/strong>(\s*)<strong>/g, '$1').replace(/<\/em>(\s*)<em>/g, '$1');
 }
 
 /* ---------- core conversion ---------- */
@@ -493,10 +504,31 @@ function convert(rawHtml, opt){
   // Strip Word junk that DOMParser kept.
   doc.querySelectorAll('o\\:p, style, script, xml, meta, link, title').forEach(n => n.remove());
 
+  // Remove Word COMMENTS entirely (markers + the comment text), while leaving
+  // the commented body text untouched. Word puts comment text in
+  // <div style='mso-element:comment(-list)'> blocks and inline reference
+  // markers in spans/anchors classed MsoCommentReference / msocomanchor, with
+  // anchors pointing at #_msocom… / _msoanchor… targets.
+  Array.from(doc.querySelectorAll('*')).forEach(el => {
+    const style = el.getAttribute('style') || '';
+    const cls = el.getAttribute('class') || '';
+    const href = el.getAttribute('href') || '';
+    const name = el.getAttribute('name') || '';
+    if (/mso-element:\s*comment/i.test(style)              // comment-list / comment containers
+        || /mso-?comment|msocom|commentreference/i.test(cls) // reference markers + comment text
+        || /^#?_msocom|^_msoanchor/i.test(href) || /^_msocom|^_msoanchor/i.test(name)){
+      el.remove();
+    }
+  });
+
   // Gather block-level elements in document order.
   const root = doc.body;
   const blocks = [];
-  function isHeadingClass(cls){ const m = (cls||'').match(/h([123])/i); return m ? +m[1] : 0; }
+  function isHeadingClass(cls){
+    const c = (cls||'').toLowerCase();
+    const m = c.match(/h(?:ld)?h?([123])\b/) || c.match(/head(?:ing)?\s*([123])\b/) || c.match(/\bh([123])\b/);
+    return m ? +m[1] : 0;
+  }
 
   function walk(parent){
     Array.from(parent.children).forEach(el => {
@@ -541,13 +573,29 @@ function convert(rawHtml, opt){
   }
   walk(root);
 
-  // Remove literal "[H1]"–"[H6]" authoring markers wherever they appear in
-  // headings, paragraphs or bullets. (These are never real content, and they
-  // can show up mid-text or on paragraphs Word didn't tag as a heading.)
+  // Remove literal "[H1]"–"[H6]" authoring markers (tolerating stray spaces
+  // like "[ H2 ]") wherever they appear in headings, paragraphs or bullets,
+  // and strip leading "*****" markers writers use to flag a snippet/callout.
   blocks.forEach(b => {
     if (b.kind === 'h' || b.kind === 'p' || b.kind === 'li'){
-      if (b.text != null) b.text = b.text.replace(/\[H[1-6]\]/gi, '').replace(/\s{2,}/g, ' ').trim();
-      if (b.html != null) b.html = b.html.replace(/\[H[1-6]\]/gi, '').replace(/\s{2,}/g, ' ').replace(/^\s+|\s+$/g, '');
+      if (b.text != null) b.text = b.text.replace(/\[\s*H\s*[1-6]\s*\]/gi, '').replace(/^\s*\*{2,}\s*/, '').replace(/\s{2,}/g, ' ').trim();
+      if (b.html != null) b.html = b.html.replace(/\[\s*H\s*[1-6]\s*\]/gi, '').replace(/^\s*\*{2,}\s*/, '').replace(/\s{2,}/g, ' ').replace(/^\s+|\s+$/g, '');
+    }
+  });
+
+  // A line marked "[CTA] …" (tolerating "[ CTA ]") becomes the alert callout
+  // box — wherever it sits and whatever style Word gave it. This runs before
+  // any heading handling so a CTA the writer styled as a heading (e.g. an
+  // H1-styled line) is still emitted instead of being dropped as the page title.
+  blocks.forEach(b => {
+    if ((b.kind === 'p' || b.kind === 'h') && /^\s*\[\s*CTA\s*\]/i.test(b.text || '')){
+      const inner = (b.html || '')
+        .replace(/<a\b[^>]*href=(["'])\s*\1[^>]*>(.*?)<\/a>/gi, '$2') // drop any empty-href anchors
+        .replace(/<\/?(?:strong|b|em|i)\b[^>]*>/gi, '')               // drop emphasis (buildAlert re-bolds it all)
+        .replace(/^\s*\[\s*CTA\s*\]\s*/i, '')                         // then strip the [CTA] marker (now at the start)
+        .trim();
+      b.kind = 'cta';
+      b.html = buildAlert(inner);
     }
   });
 
@@ -561,19 +609,37 @@ function convert(rawHtml, opt){
     if (/:\s*$/.test(b.text)){ b.kind = 'p'; }             // lead-in sentence -> body text
   });
 
+  // Headings must never carry bold/strong emphasis — unwrap it, keeping the text.
+  blocks.forEach(b => {
+    if (b.kind === 'h' && b.html != null){
+      b.html = b.html.replace(/<\/?(?:strong|b)\b[^>]*>/gi, '').replace(/\s{2,}/g, ' ').trim();
+    }
+  });
+
+  // Drop the "META" metadata block: the "META" label paragraph plus the page
+  // title and meta description that follow it. Writers put SEO metadata at the
+  // top of the document; it must never appear in the page body or the nav.
+  for (let i=0;i<blocks.length;i++){
+    const b = blocks[i];
+    if (b.kind === 'p' && /^meta(\s+description)?:?$/i.test(b.text)){
+      b.kind = 'drop';
+      let dropped = 0;
+      for (let j=i+1;j<blocks.length && dropped<2;j++){
+        if (blocks[j].kind === 'h') break;          // never cross into real content headings
+        if (blocks[j].kind !== 'p') continue;
+        blocks[j].kind = 'drop'; dropped++;          // page title, then meta description
+      }
+      break;                                         // only the first META block
+    }
+  }
+
   // Replace CTA paragraphs, image placeholders, helpline paragraph, and
   // flag any leftover [[ ... ]] editorial instructions from the writers.
   blocks.forEach(b => {
     if (b.kind !== 'p') return;
     const U = b.text.toUpperCase();
-    // Clean image placeholder, e.g. [IMAGE] or [[IMAGE]] -> figure scaffold (no warning).
-    if (opt.images && /^\[+\s*image\s*\]+$/i.test(b.text)){ b.kind = 'figure'; b.html = FIGURE_SNIPPET; return; }
-    // A paragraph marked "[CTA] …" becomes the warning/alert callout box.
-    if (/^\s*\[CTA\]/i.test(b.text)){
-      const inner = b.html.replace(/^\s*\[CTA\]\s*/i, '').trim();
-      b.kind = 'cta'; b.html = buildAlert(inner);
-      return;
-    }
+    // Image placeholder: [IMAGE], [[IMAGE]], [ IMAGE ] or [IMAGE*****] -> figure scaffold.
+    if (opt.images && /^\[+[\s*]*image[\s*]*\]+$/i.test(b.text)){ b.kind = 'figure'; b.html = FIGURE_SNIPPET; return; }
     const cta = matchCTA(U);
     if (cta){ b.kind = 'cta'; b.html = buildSnippet(cta, opt.relative); return; }
     if (U.includes('HEALTHDIRECT HELPLINE') && U.replace(/\s/g,'').includes('1800022222')){ b.kind = 'helpline'; b.html = HELPLINE_HTML; return; }
@@ -643,7 +709,8 @@ function convert(rawHtml, opt){
   // page title). The first H1 is remembered only for the on-screen stats.
   let titleText = '';
   let keyFacts = null;            // {items:[]}
-  const body = [];
+  const topBlocks = [];          // blocks that appear ABOVE the Key facts box
+  const body = [];               // everything after Key facts
 
   for (let i=0;i<pruned.length;i++){
     const b = pruned[i];
@@ -652,21 +719,25 @@ function convert(rawHtml, opt){
       continue;
     }
     if (b.isRef && b.refEmpty){ continue; }     // lone "Source references" heading, nothing under it
-    if (opt.keyFacts && !alreadyStandout && b.kind === 'h' && /^key facts$/i.test(b.text)){
+    if (opt.keyFacts && !alreadyStandout && !keyFacts && b.kind === 'h' && /^key facts$/i.test(b.text)){
       // next block should be the bullet list
       const next = pruned[i+1];
       if (next && next.kind === 'ul'){ keyFacts = {items: next.items}; i++; }
       else { keyFacts = {items: []}; warnings.push(['warn','“Key facts” heading found but no bullet list followed it.']); }
       continue;
     }
-    body.push(b);
+    // Before the Key facts box -> stays at the top; after it -> normal body.
+    (keyFacts ? body : topBlocks).push(b);
   }
+  // No Key facts box means nothing is "above" it — treat everything as body.
+  if (!keyFacts){ body.unshift(...topBlocks); topBlocks.length = 0; }
 
-  // Assign ids to H2s and build the nav from them. "Source references" headings
-  // are kept in the body but never listed in the nav.
+  // Assign ids to H2s and build the nav from them (across all content, in
+  // document order). "Source references" headings are kept but never in the nav.
+  const allContent = topBlocks.concat(body);
   const navItems = [];
   const usedIds = {};
-  body.forEach(b => {
+  allContent.forEach(b => {
     if (b.kind === 'h' && b.level === 2 && !b.isRef){
       let id = slugFor(b.text);
       if (usedIds[id]){ usedIds[id]++; const n = id + '-' + usedIds[id]; warnings.push(['warn',`Two headings map to id “${id}”. Second one set to “${n}” — check this.`]); id = n; }
@@ -678,6 +749,23 @@ function convert(rawHtml, opt){
 
   // ---- assemble fragment ----
   const parts = [];
+  const renderBlocks = list => list.forEach(b => {
+    if (b.kind === 'h'){
+      parts.push('');
+      if (b.level === 2 && b.id) parts.push(`<h2 id="${b.id}">${b.html}</h2>`);
+      else parts.push(`<h${b.level}>${b.html}</h${b.level}>`);
+    } else if (b.kind === 'p'){
+      parts.push('<p>' + b.html + '</p>');
+    } else if (b.kind === 'ul'){
+      parts.push('<ul>');
+      b.items.forEach(it => parts.push('    <li>' + it + '</li>'));
+      parts.push('</ul>');
+    } else if (b.kind === 'cta' || b.kind === 'figure' || b.kind === 'helpline' || b.kind === 'raw'){
+      parts.push(b.html);
+    }
+  });
+
+  renderBlocks(topBlocks);                       // anything above Key facts stays above it
   if (keyFacts){
     parts.push('<div class="cont_layout-standout">');
     parts.push('    <h2>Key facts</h2>');
@@ -695,31 +783,14 @@ function convert(rawHtml, opt){
     parts.push('    </ul>');
     parts.push('</nav>');
   }
-
-  // body
-  let first = true;
-  body.forEach(b => {
-    if (b.kind === 'h'){
-      parts.push('');
-      if (b.level === 2 && b.id) parts.push(`<h2 id="${b.id}">${b.html}</h2>`);
-      else parts.push(`<h${b.level}>${b.html}</h${b.level}>`);
-    } else if (b.kind === 'p'){
-      parts.push('<p>' + b.html + '</p>');
-    } else if (b.kind === 'ul'){
-      parts.push('<ul>');
-      b.items.forEach(it => parts.push('    <li>' + it + '</li>'));
-      parts.push('</ul>');
-    } else if (b.kind === 'cta' || b.kind === 'figure' || b.kind === 'helpline' || b.kind === 'raw'){
-      parts.push(b.html);
-    }
-  });
+  renderBlocks(body);
 
   let html = parts.join('\n').replace(/\n{3,}/g,'\n\n').replace(/^\n+/,'').trimEnd() + '\n';
 
   const stats = {
-    headings: body.filter(b=>b.kind==='h').length,
-    paras: body.filter(b=>b.kind==='p').length,
-    ctas: body.filter(b=>b.kind==='cta').length,
+    headings: allContent.filter(b=>b.kind==='h').length,
+    paras: allContent.filter(b=>b.kind==='p').length,
+    ctas: allContent.filter(b=>b.kind==='cta').length,
     keyFacts: keyFacts ? keyFacts.items.length : 0,
     nav: navItems.length
   };
@@ -728,6 +799,12 @@ function convert(rawHtml, opt){
 }
 
 /* ---------- link extraction + static validation ---------- */
+
+/* Relative links are checked live as absolute URLs under this domain, e.g.
+   "/bowel-cancer-screening" is tested as
+   "https://www.healthdirect.org.au/bowel-cancer-screening". */
+const LINK_CHECK_BASE = 'https://www.healthdirect.org.au';
+
 function analyseLinks(html){
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const ids = new Set(Array.from(doc.querySelectorAll('[id]')).map(e=>e.id));
@@ -743,7 +820,7 @@ function analyseLinks(html){
 
     let type = L.kind, abs = href, resolves = true;
     if (L.kind === 'internal'){
-      abs = href.startsWith('/') ? 'https://www.healthdirect.gov.au' + href : href;
+      abs = href.startsWith('/') ? LINK_CHECK_BASE + href : href;
     }
 
     // checks
@@ -872,20 +949,21 @@ function renderStaticReport(analysis){
 function renderLinksTable(rows){
   const tb = $('#linksTable').querySelector('tbody');
   tb.innerHTML = '';
-  rows.forEach(r => {
-    const checkable = /^https?:\/\//i.test(r.abs) || r.abs.startsWith('/');
-    const absUrl = /^https?:/i.test(r.abs)
-      ? r.abs
-      : (r.abs.startsWith('/') ? 'https://www.healthdirect.gov.au' + r.abs : r.abs);
-    const urlCell = checkable
-      ? `<a href="${escAttr(absUrl)}" target="_blank" rel="noopener">${esc(r.href)}</a>`
-      : esc(r.href);
+  // Only show links that can actually be tested. Anchors (#…), tel: and
+  // mailto: links have nothing to fetch, so they are left out entirely.
+  const testable = rows.filter(r => /^https?:\/\//i.test(r.abs) || r.abs.startsWith('/'));
+  if (!testable.length){
+    tb.innerHTML = '<tr><td colspan="4" class="muted" style="padding:10px">No testable links in this content.</td></tr>';
+    return;
+  }
+  testable.forEach(r => {
+    const absUrl = /^https?:/i.test(r.abs) ? r.abs : LINK_CHECK_BASE + r.abs;
     const tr = document.createElement('tr');
-    if (checkable) tr.dataset.abs = absUrl;
+    tr.dataset.abs = absUrl;
     tr.innerHTML =
         `<td>${esc(r.text)}</td>`
-      + `<td class="url">${urlCell}</td>`
-      + `<td class="resolveCell">${checkable ? '<span class="muted">not checked</span>' : '<span class="muted">n/a</span>'}</td>`
+      + `<td class="url"><a href="${escAttr(absUrl)}" target="_blank" rel="noopener">${esc(r.href)}</a></td>`
+      + `<td class="resolveCell"><span class="muted">not checked</span></td>`
       + `<td class="finalCell"><span class="muted">—</span></td>`;
     tb.appendChild(tr);
   });
@@ -1007,21 +1085,17 @@ function isRedirect(requested, finalUrl){
 }
 
 $('#btnLive').addEventListener('click', async () => {
-  if (!currentLinks || !currentLinks.rows.length){ toast('Convert something first'); return; }
   const proxy = $('#proxyUrl').value.trim();
   if (!proxy.includes('{url}')){ toast('Proxy URL must contain {url}'); return; }
 
   const btn = $('#btnLive');
-  const trs = Array.from(document.querySelectorAll('#linksTable tbody tr'));
-  const jobs = currentLinks.rows
-    .map((r, i) => ({ r, tr: trs[i] }))
-    .filter(j => j.tr && j.tr.dataset.abs);   // only checkable http(s)/relative links
-
-  if (!jobs.length){ toast('No checkable links (anchors and tel: links are skipped)'); return; }
+  // The table only contains testable links, each carrying its absolute URL.
+  const jobs = Array.from(document.querySelectorAll('#linksTable tbody tr')).filter(tr => tr.dataset.abs);
+  if (!jobs.length){ toast('No testable links to check'); return; }
 
   btn.disabled = true;
   let done = 0;
-  for (const { tr } of jobs){
+  for (const tr of jobs){
     const target = tr.dataset.abs;
     const resCell = tr.querySelector('.resolveCell');
     const finCell = tr.querySelector('.finalCell');
