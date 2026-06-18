@@ -421,8 +421,11 @@ const SLUG_RULES = [
 ];
 function slugFor(text){
   for (const [re, slug] of SLUG_RULES) if (re.test(text)) return slug;
-  return text.toLowerCase().replace(/&[a-z]+;/g,' ')
-             .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40) || 'section';
+  const base = text.toLowerCase().replace(/&[a-z]+;/g,' ')
+             .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  if (base.length <= 40) return base || 'section';
+  const cut = base.slice(0, 40);
+  return (cut.includes('-') ? cut.slice(0, cut.lastIndexOf('-')) : cut) || 'section';  // don't cut mid-word
 }
 
 /* ---------- small helpers ---------- */
@@ -573,15 +576,46 @@ function convert(rawHtml, opt){
   }
   walk(root);
 
-  // Remove literal "[H1]"–"[H6]" authoring markers (tolerating stray spaces
-  // like "[ H2 ]") wherever they appear in headings, paragraphs or bullets,
-  // and strip leading "*****" markers writers use to flag a snippet/callout.
+  // A leading [Hn] marker is the writer's explicit heading level. Older docs
+  // marked section headings this way — on plain paragraphs or even on
+  // bullet-styled lines — so promote those lines to a heading at level n,
+  // overriding whatever style Word gave them. Then remove the markers
+  // (anywhere they appear), strip leading "*****" snippet markers, and tidy.
   blocks.forEach(b => {
+    if (b.kind === 'p' || b.kind === 'h' || b.kind === 'li'){
+      const m = (b.text || '').match(/^\s*\[\s*H\s*([1-6])\s*\]/i);
+      if (m){ b.kind = 'h'; b.level = +m[1]; }     // promote; a bullet becomes a heading
+    }
     if (b.kind === 'h' || b.kind === 'p' || b.kind === 'li'){
       if (b.text != null) b.text = b.text.replace(/\[\s*H\s*[1-6]\s*\]/gi, '').replace(/^\s*\*{2,}\s*/, '').replace(/\s{2,}/g, ' ').trim();
       if (b.html != null) b.html = b.html.replace(/\[\s*H\s*[1-6]\s*\]/gi, '').replace(/^\s*\*{2,}\s*/, '').replace(/\s{2,}/g, ' ').replace(/^\s+|\s+$/g, '');
     }
   });
+
+  // Some older docs fused a heading and its first body sentence into one marker
+  // line (e.g. "How is bursitis treated? Bursitis can often be treated at home…",
+  // often with the heading clause bolded and butted right up against the body).
+  // Split the leading heading clause off from the trailing sentence so both
+  // render correctly. A genuinely long single-clause heading (no substantial
+  // text after its punctuation) is left whole. Reverse order keeps indices valid.
+  for (let i = blocks.length - 1; i >= 0; i--){
+    const b = blocks[i];
+    if (b.kind === 'h' && b.text && b.text.length > 60){
+      // De-emphasise so the split sees the heading clause cleanly (headings carry
+      // no bold anyway); links in the trailing sentence are kept. Space after the
+      // heading punctuation is optional — Word often drops it at a run boundary.
+      const deemph = (b.html || '').replace(/<\/?(?:strong|b|em|i)\b[^>]*>/gi, '').replace(/^\s+/, '');
+      const re = /^(.{3,80}?[?.!])\s*([A-Z(][\s\S]{15,})$/;
+      const mt = b.text.match(re);
+      const mh = deemph.match(re);
+      if (mt && mh){
+        blocks.splice(i, 1,
+          { kind: 'h', level: b.level, text: mt[1].trim(), html: mh[1].trim() },
+          { kind: 'p', text: mt[2].trim(), html: mh[2].trim() }
+        );
+      }
+    }
+  }
 
   // A line marked "[CTA] …" (tolerating "[ CTA ]") becomes the alert callout
   // box — wherever it sits and whatever style Word gave it. This runs before
@@ -600,13 +634,14 @@ function convert(rawHtml, opt){
   });
 
   // Heading guards: demote things that are styled as a heading but are
-  // really body text. A genuine section heading is short and is never a
-  // lead-in sentence ending in a colon (e.g. "You can reduce your risk by
-  // making the following choices:").
+  // really body text. A genuine section heading is short, never a lead-in
+  // sentence ending in a colon, and never a full sentence ending in a full
+  // stop (some docs style link sentences as H2, e.g. "Find an ACCHO … near you.").
   blocks.forEach(b => {
     if (b.kind !== 'h') return;
     if (b.text.length > 120){ b.kind = 'p'; return; }      // very long -> body text
-    if (/:\s*$/.test(b.text)){ b.kind = 'p'; }             // lead-in sentence -> body text
+    if (/:\s*$/.test(b.text)){ b.kind = 'p'; return; }     // lead-in sentence -> body text
+    if (/[.]\s*$/.test(b.text)){ b.kind = 'p'; }           // full sentence -> body text
   });
 
   // Headings must never carry bold/strong emphasis — unwrap it, keeping the text.
@@ -643,9 +678,10 @@ function convert(rawHtml, opt){
     const cta = matchCTA(U);
     if (cta){ b.kind = 'cta'; b.html = buildSnippet(cta, opt.relative); return; }
     if (U.includes('HEALTHDIRECT HELPLINE') && U.replace(/\s/g,'').includes('1800022222')){ b.kind = 'helpline'; b.html = HELPLINE_HTML; return; }
-    // A paragraph wrapped entirely in [[ ... ]] is an unactioned writer instruction.
-    if (/^\[\[[\s\S]*\]\]$/.test(b.text)){
-      const instr = b.text.replace(/^\[\[\s*|\s*\]\]$/g,'');
+    // A paragraph wrapped entirely in [[ ... ]] (tolerating spaces, e.g.
+    // "[ [ … ] ]") is an unactioned writer instruction.
+    if (/^\[\s*\[[\s\S]*\]\s*\]$/.test(b.text)){
+      const instr = b.text.replace(/^\[\s*\[\s*|\s*\]\s*\]$/g,'');
       if (opt.images && /\b(image|images|figure|diagram|illustration|picture|photo|graphic|map|table)\b/i.test(instr)){
         b.kind = 'figure'; b.html = FIGURE_SNIPPET;
         warnings.push(['warn', `Found an editorial instruction and inserted an image placeholder in its place — add the correct image. Instruction was: “${instr}”`]);
