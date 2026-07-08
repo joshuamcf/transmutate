@@ -486,7 +486,7 @@ function cleanInline(node, relative){
     else if (tag === 'em' || tag === 'i'){ out += inner.trim() ? `<em>${inner}</em>` : inner; }
     else if (tag === 'sup'){ out += `<sup>${inner}</sup>`; }
     else if (tag === 'sub'){ out += `<sub>${inner}</sub>`; }
-    else if (tag === 'br'){ out += '<br>'; }
+    else if (tag === 'br'){ out += ' '; }   // <br>/<br /> are dropped — add line breaks manually later
     else { out += inner; } // span, font, u, etc. -> unwrap
   });
   // Merge adjacent identical emphasis runs (Word fragments bold/italic text into
@@ -822,6 +822,10 @@ function convert(rawHtml, opt){
   renderBlocks(body);
 
   let html = parts.join('\n').replace(/\n{3,}/g,'\n\n').replace(/^\n+/,'').trimEnd() + '\n';
+  // Remove any <br>/<br /> tags entirely (e.g. inside raw tables/figures),
+  // collapsing only the spaces around them so words don't fuse and the
+  // output's own indentation/newlines are left intact.
+  html = html.replace(/[ \t]*<br\s*\/?>[ \t]*/gi, ' ');
 
   const stats = {
     headings: allContent.filter(b=>b.kind==='h').length,
