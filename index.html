@@ -171,6 +171,24 @@
   details.help summary{cursor:pointer;font-weight:600;color:var(--hd-blue)}
   details.help p{margin:8px 0}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
+
+  /* ---- Optimizely field segments ---- */
+  .opti-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
+  .opti-controls label{font-size:13px;font-weight:600;color:var(--hd-blue)}
+  select.site{font:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;color:var(--ink);background:#fff;cursor:pointer}
+  select.site:focus-visible{outline:2px solid var(--hd-green);outline-offset:1px}
+  .seg{border:1px solid var(--line);border-radius:6px;margin-bottom:12px;overflow:hidden}
+  .seg-head{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fafcfc;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .seg-title{font-weight:700;font-size:13px;color:var(--hd-blue)}
+  .seg-fields{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line)}
+  .seg-field{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .seg-flabel{font-size:12px;font-weight:700;color:var(--muted);min-width:40px}
+  .seg-fval{font-family:var(--mono);font-size:12px;background:#f1f5f6;padding:2px 6px;border-radius:4px;word-break:break-word;flex:1}
+  .seg-bodyhead{display:flex;align-items:center;gap:8px;padding:8px 10px;flex-wrap:wrap}
+  .seg-src{margin:0;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:12px;line-height:1.5;padding:10px 12px;background:#fbfdfd;max-height:32vh;overflow:auto;color:#173039}
+  .seg-callout{margin:8px 10px;padding:8px 12px;border-radius:8px;background:var(--bg-soft);border-left:4px solid var(--hd-green);font-size:12.5px;color:var(--hd-blue)}
+  .seg-callout .tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:var(--hd-green);color:#fff;border-radius:999px;padding:2px 8px;margin-right:6px}
+  .seg-callout .msg{margin-top:5px;color:var(--muted);line-height:1.4}
 </style>
 </head>
 <body>
@@ -220,13 +238,14 @@
     <!-- OUTPUT -->
     <section class="panel" aria-label="Output">
       <div class="tabs" role="tablist">
-        <button role="tab" id="tab-out" aria-selected="true" aria-controls="pane-out">HTML output</button>
+        <button role="tab" id="tab-opti" aria-selected="true" aria-controls="pane-opti">Optimizely fields <span id="optiCount" class="badge info" style="display:none"></span></button>
+        <button role="tab" id="tab-out" aria-selected="false" aria-controls="pane-out">HTML output</button>
         <button role="tab" id="tab-prev" aria-selected="false" aria-controls="pane-prev">Structure preview</button>
         <button role="tab" id="tab-links" aria-selected="false" aria-controls="pane-links">Link check <span id="linkCount" class="badge info" style="display:none"></span></button>
       </div>
       <div class="body">
         <!-- HTML output -->
-        <div class="tabpane active" id="pane-out" role="tabpanel" aria-labelledby="tab-out">
+        <div class="tabpane" id="pane-out" role="tabpanel" aria-labelledby="tab-out">
           <pre class="out" id="outCode" aria-live="polite">Your converted HTML will appear here.</pre>
           <div class="btnrow">
             <button class="btn primary" id="btnCopy" disabled>Copy HTML</button>
@@ -270,6 +289,28 @@
               <tbody></tbody>
             </table>
           </div>
+        </div>
+
+        <!-- Optimizely fields -->
+        <div class="tabpane active" id="pane-opti" role="tabpanel" aria-labelledby="tab-opti">
+          <div class="opti-controls">
+            <label for="optSite">This page lives on:</label>
+            <select id="optSite" class="site">
+              <option value="healthdirect">Healthdirect (healthdirect.gov.au)</option>
+              <option value="pbb">Pregnancy, Birth &amp; Baby (pregnancybirthbaby.org.au)</option>
+            </select>
+          </div>
+          <p class="note">Content is split into one segment per H2, ready to paste into Optimizely rich text fields. Each section’s <strong>Title</strong> and <strong>ID</strong> are given separately from its body. <strong>Key facts</strong> copies as a bare <code>&lt;li&gt;</code> bullet list (paste as text). <strong>Standard callout boxes</strong> (Symptom Checker, Question Builder, etc.) are shared blocks — they aren’t copied as code; instead a note shows which block to drag in at the bottom of its section. <strong>Source references</strong> come out as a final bullet-list segment. Links to the selected site are made <strong>relative</strong> so Optimizely resolves them to internal pages on paste; other links stay as full URLs and open in a new tab. Images are noted as text, not shown.</p>
+          <div id="optiSegments"><p class="note">Convert some content to see Optimizely field segments.</p></div>
+          <details class="help">
+            <summary>How to use these in Optimizely</summary>
+            <p><strong>Title / ID:</strong> paste these into the section’s heading and anchor-ID fields. The ID is auto-generated for now — a proper matched-ID list can be wired in later.</p>
+            <p><strong>Body — Copy for Optimizely</strong> puts the segment on your clipboard as rich content, so formatting and links come across; <strong>Copy source</strong> copies the raw HTML for the field’s HTML/source view. If a Copy button ever fails (some browsers block it on <code>file://</code>), use <strong>Select all</strong> and press Ctrl/Cmd+C.</p>
+            <p><strong>Key facts:</strong> the field takes only <code>&lt;li&gt;</code> items and pastes as text — use Copy source (or Copy for Optimizely) and paste into the list field.</p>
+            <p><strong>Callout boxes:</strong> the green note at the bottom of a section names the shared block to drag in there. Nothing to paste — it’s a placement reminder.</p>
+            <p><strong>Source references:</strong> formatted as “Organisation — Page name (link) (Authors)”. Built from the references table in your pasted content, so the page links are kept.</p>
+            <p>For a relative link to resolve to a page, the field must be on the matching site and the editor’s paste-time link handling must be switched on. If a link comes in as plain text, paste into the source view instead.</p>
+          </details>
         </div>
       </div>
     </section>
@@ -894,6 +935,7 @@ const $ = sel => document.querySelector(sel);
 let lastWordPaste = null;   // raw text/html captured from the last Word paste
 let currentHtml = '';
 let currentLinks = null;
+let lastConvertInput = '';  // raw input of the last conversion (to rebuild Optimizely segments)
 
 function opts(){
   return {
@@ -917,7 +959,7 @@ function wireTabs(ids){
   }));
 }
 wireTabs(['tab-word','tab-html']);
-wireTabs(['tab-out','tab-prev','tab-links']);
+wireTabs(['tab-opti','tab-out','tab-prev','tab-links']);
 
 /* capture raw Word HTML on paste (preserves Word's style classes) */
 const wordEditor = $('#wordEditor');
@@ -1009,12 +1051,488 @@ function renderLinksTable(rows){
   });
 }
 
+/* =====================================================================
+   Optimizely field output
+   Splits the converted content into one copyable segment per H2 and
+   rewrites links so they resolve as internal pages in Optimizely. The
+   segments are built from a fresh conversion with ABSOLUTE links, then
+   links to the chosen site are made relative here — this keeps the
+   direction right whichever site the page belongs to.
+   ===================================================================== */
+
+/* Bare host (no www.) for the two Healthdirect Australia sites. */
+function siteHost(site){ return site === 'pbb' ? 'pregnancybirthbaby.org.au' : 'healthdirect.gov.au'; }
+
+/* Rewrite every anchor in the doc for the target site:
+     • link to THIS site -> root-relative path (internal page), no new tab
+     • link to elsewhere  -> left as a full URL, opens in a new tab
+   tel:, mailto: and on-page (#) links are left alone. */
+function rewriteLinksForSite(doc, site){
+  const home = siteHost(site);
+  doc.querySelectorAll('a[href]').forEach(a => {
+    const raw = (a.getAttribute('href') || '').trim();
+    if (!raw || raw.startsWith('#') || /^(tel:|mailto:)/i.test(raw)) return;
+    if (raw.startsWith('/')){                            // already relative -> treat as internal
+      a.removeAttribute('target'); a.removeAttribute('aria-label'); a.removeAttribute('rel');
+      return;
+    }
+    let u; try { u = new URL(raw); } catch { return; }   // not an absolute URL -> leave as-is
+    if (!/^https?:$/i.test(u.protocol)) return;
+    const host = u.hostname.replace(/^www\./i, '').toLowerCase();
+    if (host === home){                                  // this site -> relative internal page
+      a.setAttribute('href', (u.pathname + u.search + u.hash) || '/');
+      a.removeAttribute('target'); a.removeAttribute('aria-label'); a.removeAttribute('rel');
+    } else {                                             // external (incl. the other site) -> new tab
+      a.setAttribute('target', '_blank');
+      a.removeAttribute('aria-label');
+    }
+  });
+}
+
+/* A text-only note that stands in for an image (noted, never displayed). */
+function imageNoteNode(doc, caption){
+  const p = doc.createElement('p');
+  const strong = doc.createElement('strong');
+  strong.textContent = (caption && caption.toUpperCase() !== 'CAPTION')
+    ? '[IMAGE — add in Optimizely] ' + caption
+    : '[IMAGE — add in Optimizely]';
+  p.appendChild(strong);
+  return p;
+}
+
+/* Friendly names for the standard callout boxes (the shared Optimizely blocks).
+   Keyed by the snippet key that matchCTA() returns from the callout's text. */
+const CALLOUT_NAMES = {
+  symptom:        'Symptom Checker',
+  questionBuilder:'Question Builder',
+  serviceFinder:  'Service Finder',
+  medicines:      'Medicines information',
+  painPlanner:    'Pain Question Planner',
+  opioid:         'Opioid Risk Indicator',
+  bmi:            'BMI Calculator',
+  vaccination:    'Service Finder (flu vaccination)'
+};
+/* Is this top-level node a standard callout box? Returns {name, text} or null. */
+function calloutInfo(node){
+  if (node.nodeType !== 1) return null;
+  const isBox = node.tagName.toLowerCase() === 'a'
+    && /cont_layout-media-object__icon-standout/.test(node.getAttribute('class') || '');
+  if (!isBox) return null;
+  const text = norm(node.textContent);
+  const key = matchCTA(text.toUpperCase());
+  return { name: (key && CALLOUT_NAMES[key]) || 'Callout', text };
+}
+
+/* Rewrite one reference link for the target site (same rules as the body):
+   this-site -> relative internal path; anything else -> full URL + new tab. */
+function refAnchor(href, text, site){
+  const raw = (href || '').trim();
+  const label = esc(text || raw);
+  if (!raw) return label;
+  if (raw.startsWith('#') || /^(tel:|mailto:)/i.test(raw)) return `<a href="${escAttr(raw)}">${label}</a>`;
+  if (raw.startsWith('/')) return `<a href="${escAttr(raw)}">${label}</a>`;
+  let u; try { u = new URL(raw); } catch { return `<a href="${escAttr(raw)}">${label}</a>`; }
+  if (!/^https?:$/i.test(u.protocol)) return `<a href="${escAttr(raw)}">${label}</a>`;
+  const host = u.hostname.replace(/^www\./i, '').toLowerCase();
+  if (host === siteHost(site)) return `<a href="${escAttr((u.pathname + u.search + u.hash) || '/')}">${label}</a>`;
+  return `<a href="${escAttr(raw)}" target="_blank" rel="noopener">${label}</a>`;
+}
+
+/* Parse one reference into {org, pageName, url, authors} from an element's text
+   plus any link it carries. Handles the shapes writers actually use:
+     Organisation — Page name (Authors) (https://url)
+     Organisation — Page name (https://url)
+     Organisation — <a href="url">url or page name</a>
+   The URL may sit in a trailing "(https://…)", inside an <a>, or bare. The
+   page name is whatever descriptive text is left; if there is none, the URL is
+   used as the link text. Authors are a non-URL parenthetical. */
+function parseRefItem(el){
+  const a = el.querySelector ? el.querySelector('a[href]') : null;
+  const anchorHref = a ? a.getAttribute('href') : '';
+  let text = straightenQuotes(norm(el.textContent)).replace(/^[•·●▪◦\u2013\u2014\-\s]+/, '');
+  if (!text) return null;
+
+  // Organisation — rest  (em dash, en dash, or a spaced hyphen)
+  let org = '', rest = text;
+  const dash = text.match(/^([\s\S]*?)\s*[\u2014\u2013]\s*([\s\S]*)$/) || text.match(/^([\s\S]*?)\s+-\s+([\s\S]*)$/);
+  if (dash){ org = dash[1].trim(); rest = dash[2].trim(); }
+
+  // URL: a "(https://…)" parenthetical wins, then an <a href>, then a bare URL.
+  let url = '';
+  const paren = rest.match(/\(\s*(https?:\/\/[^\s)]+)\s*\)/i);
+  if (paren){ url = paren[1]; rest = (rest.slice(0, paren.index) + rest.slice(paren.index + paren[0].length)).trim(); }
+  else if (anchorHref){ url = anchorHref; }
+  else { const bare = rest.match(/(https?:\/\/[^\s)]+)/i); if (bare){ url = bare[1]; rest = rest.replace(bare[0], '').trim(); } }
+
+  // Authors: a trailing non-URL parenthetical, e.g. "(Blagosklonny)".
+  let authors = '';
+  const ap = rest.match(/\(([^)]*)\)\s*$/);
+  if (ap && !/https?:\/\//i.test(ap[1])){ authors = ap[1].trim(); rest = rest.slice(0, ap.index).trim(); }
+
+  let pageName = rest.replace(/[\s\u2014\u2013-]+$/, '').trim();
+  if (!pageName) pageName = url;                       // link the URL itself when there's no title
+  if (!url && !pageName) return null;
+  return { org, pageName, url, authors };
+}
+
+/* Turn a table row into {org, pageName, url, authors, extra}. The Healthdirect
+   references table has a fixed layout:
+     col 0 = Publisher
+     col 1 = Page title (with any authors in a trailing "(…)")
+     col 2 = Link — a URL (plain text or an <a href>), or, for print-only
+             sources, edition/version details instead of a link. */
+function parseRefRow(tr){
+  const cells = Array.from(tr.children).filter(c => /^(td|th)$/i.test(c.tagName));
+  if (!cells.length) return null;
+  if (cells.every(c => c.tagName.toLowerCase() === 'th')) return null;
+  const cellTxt = c => straightenQuotes(norm(c ? c.textContent : ''));
+
+  const org  = cellTxt(cells[0]);
+  const c1   = cellTxt(cells[1]);
+  const c2el = cells[2];
+  const c2   = cellTxt(c2el);
+
+  // URL: prefer the <a href> in the Link cell; otherwise a bare URL in its text.
+  const a2 = c2el ? c2el.querySelector('a[href]') : null;
+  let url = a2 ? a2.getAttribute('href') : '';
+  if (!url){ const m = c2.match(/https?:\/\/\S+/i); if (m) url = m[0]; }
+
+  // Page title + trailing "(authors)" from the Page title cell.
+  let pageName = c1, authors = '';
+  const ap = c1.match(/\(([^)]*)\)\s*$/);
+  if (ap){ authors = ap[1].trim(); pageName = c1.slice(0, ap.index).trim(); }
+
+  // Print-only source: no link, so the Link cell holds edition/version detail.
+  const extra = (!url && c2 && !/^https?:/i.test(c2)) ? c2 : '';
+
+  if (!org && !pageName && !url) return null;
+  return { org, pageName: pageName || url, url, authors, extra };
+}
+
+/* Is this element a heading (real <h*> or a Word heading-styled paragraph)? */
+function isRefStopHeading(el){
+  const tag = el.tagName.toLowerCase();
+  if (/^h[1-6]$/.test(tag)) return true;
+  return /\bh(?:ld)?h?[1-6]\b|head(?:ing)?\s*[1-6]/i.test(el.getAttribute('class') || '');
+}
+
+/* Build the "Source references" segment from the RAW input (which still has the
+   links — the converted output strips them). Reads whatever follows the
+   references heading (a bullet list, bullet paragraphs, or a table) and formats
+   each entry as:  Organisation — <a>Page name</a> (Authors)
+   with the page name hyperlinked to the source URL. Returns null if none. */
+function buildReferencesSegment(rawInput, site){
+  const doc = new DOMParser().parseFromString(rawInput, 'text/html');
+  const REF_RE  = /^(sources?|references|source references?|reference list)\s*$/i;
+  const HEAD_RE = /^(organi[sz]ations?|authors?|titles?|sources?|references?|pages?|links?|names?|url)s?$/i;
+
+  // Locate the references heading (a leaf-ish element whose whole text is it).
+  const blocks = Array.from(doc.body.querySelectorAll('p,div,h1,h2,h3,h4,h5,h6,ul,ol,table'));
+  let headingIdx = -1;
+  for (let i = 0; i < blocks.length; i++){
+    const t = blocks[i].tagName.toLowerCase();
+    if (t === 'ul' || t === 'ol' || t === 'table') continue;
+    if (REF_RE.test(norm(blocks[i].textContent))){ headingIdx = i; break; }
+  }
+  if (headingIdx === -1) return null;
+  const headingEl = blocks[headingIdx];
+
+  // Collect reference source elements after the heading, stopping at the next
+  // heading. Skip anything nested inside a table/list we've already taken.
+  const parsed = [];
+  let takenContainer = null;
+  for (let i = headingIdx + 1; i < blocks.length; i++){
+    const el = blocks[i];
+    if (takenContainer && takenContainer.contains(el)) continue;
+    takenContainer = null;
+    if (isRefStopHeading(el)) break;
+    const tag = el.tagName.toLowerCase();
+    if (tag === 'ul' || tag === 'ol'){
+      Array.from(el.children).forEach(li => { if (li.tagName.toLowerCase() === 'li'){ const r = parseRefItem(li); if (r) parsed.push(r); } });
+      takenContainer = el; continue;
+    }
+    if (tag === 'table'){
+      Array.from(el.querySelectorAll('tr')).forEach((tr, idx) => {
+        if (idx === 0 && !tr.querySelector('a[href]')){
+          const cells = Array.from(tr.children).filter(c => /^(td|th)$/i.test(c.tagName));
+          const t = cells.map(c => straightenQuotes(norm(c.textContent)));
+          const allTh = cells.length && cells.every(c => c.tagName.toLowerCase() === 'th');
+          const templateHeader = /^publisher$/i.test(t[0] || '') || /^page\s*title$/i.test(t[1] || '') || /^link\b/i.test(t[2] || '');
+          const labelHeader = cells.length >= 2 && t.every(x => !x || HEAD_RE.test(x));
+          if (allTh || templateHeader || labelHeader) return;   // header row
+        }
+        const r = parseRefRow(tr); if (r) parsed.push(r);
+      });
+      takenContainer = el; continue;
+    }
+    if (tag === 'div' && el.querySelector('p,div,ul,ol,table,li')) continue;   // container — its children come next
+    // paragraph / leaf div -> one reference line (skip empty and header labels)
+    const txt = norm(el.textContent);
+    if (!txt || HEAD_RE.test(txt)) continue;
+    const r = parseRefItem(el); if (r) parsed.push(r);
+  }
+
+  // Format each parsed entry into a bullet, hyperlinking the page name.
+  const items = parsed.map(r => {
+    let li = r.org ? esc(r.org) : '';
+    const linked = r.url ? refAnchor(r.url, r.pageName || r.url, site) : esc(r.pageName || '');
+    if (linked){ li += (r.org ? ' — ' : ''); li += linked; }
+    if (r.authors && r.authors !== r.org && r.authors !== r.pageName) li += ` (${esc(r.authors)})`;
+    if (r.extra && r.extra !== r.pageName && r.extra !== r.authors) li += ` (${esc(r.extra)})`;
+    return '    <li>' + li + '</li>';
+  }).filter(li => !/^\s*<li>\s*<\/li>\s*$/.test(li));
+
+  if (!items.length) return null;
+  return {
+    title: 'Source references',
+    kind: 'references',
+    id: '',
+    html: '<ul>\n' + items.join('\n') + '\n</ul>',
+    callouts: []
+  };
+}
+
+/* Build the per-H2 segments from a converted (absolute-link) fragment. */
+function buildOptimizelySegments(html, site, rawInput){
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const REF_RE = /^(sources?|references|source references?|reference list)\s*$/i;
+
+  rewriteLinksForSite(doc, site);
+
+  // Images -> text notes (figures first, then any stray <img>).
+  doc.querySelectorAll('figure').forEach(fig => {
+    const cap = fig.querySelector('figcaption');
+    fig.replaceWith(imageNoteNode(doc, cap ? norm(cap.textContent) : ''));
+  });
+  doc.querySelectorAll('img').forEach(img => {
+    img.replaceWith(imageNoteNode(doc, norm(img.getAttribute('alt') || '')));
+  });
+
+  // Split top-level blocks into segments at each H2.
+  const segments = [];
+  let cur = null;
+  let skipRef = false;                                             // inside a references section (handled separately)
+  const start = (title, kind) => { cur = {title, kind, id:'', nodes:[], callouts:[]}; segments.push(cur); };
+
+  Array.from(doc.body.children).forEach(node => {
+    const tag = node.tagName.toLowerCase();
+    const cls = node.getAttribute('class') || '';
+    if (/cont_nav-index-table/.test(cls)) return;                // never include the generated nav
+
+    if (tag === 'h2'){
+      // A references heading ends the normal flow — the references are rebuilt
+      // as their own final segment (with links) further down.
+      if (REF_RE.test(norm(node.textContent))){ skipRef = true; cur = null; return; }
+      skipRef = false;
+      start(norm(node.textContent) || 'Section', 'section');     // heading -> separate Title + ID
+      cur.id = node.id || '';
+      return;
+    }
+    if (skipRef) return;                                          // drop the stripped references body
+
+    if (tag === 'div' && /cont_layout-standout/.test(cls)){      // Key facts box -> its own segment
+      start('Key facts', 'key facts');
+      // The Key facts field takes only <li> elements, pasted as text — so
+      // reduce the box to a bare bullet list of its items.
+      cur.liHtml = Array.from(node.querySelectorAll('li'))
+        .map(li => '<li>' + li.innerHTML.trim() + '</li>').join('\n');
+      cur = null; return;
+    }
+
+    // Standard callout boxes are shared Optimizely blocks — they are NOT copied
+    // as code. Instead the current segment gets a persistent note telling the
+    // author which block to drag in at the bottom of that section.
+    const co = calloutInfo(node);
+    if (co){
+      if (!cur) start('Introduction', 'intro');
+      cur.callouts.push(co);
+      return;
+    }
+
+    if (!cur) start('Introduction', 'intro');                    // content before the first H2
+    cur.nodes.push(node);
+  });
+
+  const built = segments
+    .map(seg => ({
+      title: seg.title,
+      kind: seg.kind,
+      id: seg.id || '',
+      callouts: seg.callouts || [],
+      html: (seg.liHtml != null ? seg.liHtml : seg.nodes.map(n => n.outerHTML).join('\n'))
+              .replace(/\n{3,}/g, '\n\n').trim()
+    }))
+    // Keep a segment if it has body, is a section (title/ID still needed), or carries callout notes.
+    .filter(seg => seg.html || seg.kind === 'section' || (seg.callouts && seg.callouts.length));
+
+  // Source references become the final segment, formatted as a bullet list.
+  const refSeg = buildReferencesSegment(rawInput || '', site);
+  if (refSeg) built.push(refSeg);
+
+  return built;
+}
+
+/* Copy a string to the clipboard as RICH html (text/html) + plain text.
+   The copy-event override is tried FIRST and is the reliable path: it writes
+   the RAW string straight to the clipboard, so relative hrefs like "/diabetes"
+   are never resolved against this page's domain (the bug that produced
+   "https://<this-host>/diabetes"). The async Clipboard API is only a fallback
+   for the rare case where execCommand('copy') is unavailable. */
+function copyViaCopyEvent(html){
+  let ok = false;
+  const holder = document.createElement('span');
+  holder.textContent = 'copy';
+  holder.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(holder);
+  const range = document.createRange(); range.selectNodeContents(holder);
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  const handler = e => {
+    e.preventDefault();
+    e.clipboardData.setData('text/html', html);
+    e.clipboardData.setData('text/plain', html);
+    ok = true;
+  };
+  document.addEventListener('copy', handler);
+  try { if (!document.execCommand('copy')) ok = false; } catch (e){ ok = false; }
+  document.removeEventListener('copy', handler);
+  sel.removeAllRanges(); holder.remove();
+  return ok;
+}
+async function copyRich(html){
+  if (copyViaCopyEvent(html)) return true;
+  try {
+    if (navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html':  new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([html], {type:'text/plain'})
+      })]);
+      return true;
+    }
+  } catch (e){ /* ignore */ }
+  return false;
+}
+
+/* Render the Optimizely segments into their tab. */
+function renderOptimizely(segments, site){
+  const box = $('#optiSegments');
+  const count = $('#optiCount');
+  box._segments = segments;
+  if (!segments.length){
+    box.innerHTML = '<p class="note">No content to segment yet — convert something first.</p>';
+    count.style.display = 'none';
+    return;
+  }
+  const siteName = site === 'pbb' ? 'Pregnancy, Birth &amp; Baby' : 'Healthdirect';
+  let out = `<p class="note">${segments.length} segment${segments.length>1?'s':''} · site-internal links made relative for <strong>${siteName}</strong>.</p>`;
+  segments.forEach((seg, i) => {
+    const badge = seg.kind === 'section' ? 'info'
+                : seg.kind === 'key facts' ? 'ok'
+                : seg.kind === 'references' ? 'info' : 'warn';
+    out += '<div class="seg">';
+    out +=   '<div class="seg-head">'
+      +        `<span class="seg-title">${esc(seg.title)}</span>`
+      +        `<span class="badge ${badge}">${esc(seg.kind)}</span>`
+      +      '</div>';
+
+    // Sections expose the heading as separate Title + ID fields.
+    if (seg.kind === 'section'){
+      out += '<div class="seg-fields">';
+      out +=   '<div class="seg-field">'
+        +        '<span class="seg-flabel">Title</span>'
+        +        `<code class="seg-fval">${esc(seg.title)}</code>`
+        +        `<button class="btn small opti-copy" data-i="${i}" data-field="title" data-copy="text">Copy</button>`
+        +      '</div>';
+      out +=   '<div class="seg-field">'
+        +        '<span class="seg-flabel">ID</span>'
+        +        `<code class="seg-fval">${seg.id ? esc(seg.id) : '<span class="muted">none</span>'}</code>`
+        +        `<button class="btn small opti-copy" data-i="${i}" data-field="id" data-copy="text"${seg.id ? '' : ' disabled'}>Copy</button>`
+        +      '</div>';
+      out += '</div>';
+    }
+
+    // Body (or, for Key facts / references, the bullet list). Only shown when
+    // there is body content — a section may be heading + callout only.
+    if (seg.html){
+      const bodyLabel = seg.kind === 'key facts'  ? 'Bullet list (&lt;li&gt; items)'
+                      : seg.kind === 'references' ? 'Source references (bullet list)'
+                      : seg.kind === 'section'    ? 'Body' : 'Content';
+      out += '<div class="seg-bodyhead">'
+        +      `<span class="seg-flabel" style="min-width:auto">${bodyLabel}</span>`
+        +      '<span style="flex:1"></span>'
+        +      `<button class="btn small opti-copy" data-i="${i}" data-field="body" data-copy="rich">Copy for Optimizely</button>`
+        +      `<button class="btn small ghost opti-copy" data-i="${i}" data-field="body" data-copy="text">Copy source</button>`
+        +      `<button class="btn small ghost opti-select" data-i="${i}">Select all</button>`
+        +    '</div>';
+      out += `<pre class="seg-src">${esc(seg.html)}</pre>`;
+    }
+
+    // Persistent notes for any standard callout boxes assigned to this section —
+    // these are shared blocks the author drags in; the code is not copied.
+    (seg.callouts || []).forEach(co => {
+      out += '<div class="seg-callout">'
+        +      '<span class="tag">Callout block</span>'
+        +      `<strong>${esc(co.name)}</strong> — drag the shared block in at the bottom of this section.`
+        +      `<div class="msg">${esc(co.text)}</div>`
+        +    '</div>';
+    });
+
+    out += '</div>';
+  });
+  box.innerHTML = out;
+  count.style.display = '';
+  count.className = 'badge info';
+  count.textContent = segments.length + ' seg' + (segments.length>1?'s':'');
+}
+
+/* Rebuild the Optimizely segments from the last converted input + current site. */
+function refreshOptimizely(){
+  const site = $('#optSite').value;
+  if (!lastConvertInput.trim()){ renderOptimizely([], site); return; }
+  const res = convert(lastConvertInput, Object.assign({}, opts(), {relative:false, nav:false}));
+  renderOptimizely(buildOptimizelySegments(res.html, site, lastConvertInput), site);
+}
+
+$('#optSite').addEventListener('change', refreshOptimizely);
+$('#optiSegments').addEventListener('click', async e => {
+  const btn = e.target.closest('button'); if (!btn) return;
+  const segs = $('#optiSegments')._segments || [];
+  const seg = segs[+btn.dataset.i]; if (!seg) return;
+
+  // Select all: highlight this segment's source so the user can press Ctrl/Cmd+C.
+  if (btn.classList.contains('opti-select')){
+    const pre = btn.closest('.seg').querySelector('.seg-src');
+    if (pre){
+      const range = document.createRange(); range.selectNodeContents(pre);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      pre.scrollIntoView({block:'nearest'});
+      toast('Selected — press Ctrl/Cmd+C to copy');
+    }
+    return;
+  }
+
+  const field = btn.dataset.field;
+  let content, what;
+  if (field === 'title'){ content = seg.title; what = 'Title'; }
+  else if (field === 'id'){ content = seg.id || ''; what = 'ID'; }
+  else { content = seg.html || ''; what = seg.kind === 'key facts' ? 'Key facts' : (seg.title || 'Segment'); }
+  if (!content){ toast('Nothing to copy'); return; }
+  if (btn.dataset.copy === 'rich'){
+    const ok = await copyRich(content);
+    toast(ok ? ('Copied ' + what + ' for Optimizely') : 'Copy failed — use Select all, then Ctrl/Cmd+C');
+  } else {
+    let ok = false;
+    try { await navigator.clipboard.writeText(content); ok = true; } catch { ok = await copyRich(content); }
+    toast(ok ? (what + ' copied') : 'Copy failed — use Select all, then Ctrl/Cmd+C');
+  }
+});
+
 /* run conversion */
 function runConvert(){
   const input = getInput();
   if (!input.trim()){ toast('Paste some content first'); return; }
   const res = convert(input, opts());
   currentHtml = res.html;
+  lastConvertInput = input;
 
   // output
   $('#outCode').textContent = res.html;
@@ -1048,6 +1566,9 @@ function runConvert(){
   lc.className = 'badge ' + (errCount ? 'err' : warnCount ? 'warn' : 'ok');
   lc.textContent = errCount ? (errCount+' err') : warnCount ? (warnCount+' warn') : 'ok';
 
+  // Optimizely field segments
+  refreshOptimizely();
+
   toast('Converted');
 }
 
@@ -1070,7 +1591,8 @@ $('#btnDownload').addEventListener('click', () => {
 
 $('#btnClear').addEventListener('click', () => {
   wordEditor.innerHTML = ''; $('#htmlInput').value = ''; lastWordPaste = null;
-  currentHtml = ''; currentLinks = null;
+  currentHtml = ''; currentLinks = null; lastConvertInput = '';
+  refreshOptimizely();
   $('#outCode').textContent = 'Your converted HTML will appear here.';
   $('#previewBox').textContent = 'Convert something to preview it.';
   $('#staticReport').innerHTML = ''; $('#linksTable').querySelector('tbody').innerHTML = '';
