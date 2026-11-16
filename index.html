@@ -55,6 +55,7 @@
   .options label{font-size:13px;cursor:pointer;user-select:none}
   .options input[type=checkbox]{width:16px;height:16px;accent-color:var(--hd-green);cursor:pointer}
   .options .sep{flex:1}
+  .options select{font:inherit;font-size:13px;padding:3px 6px;border:1px solid var(--line);border-radius:4px;color:var(--ink);background:#fff}
 
   .cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
   @media (max-width:920px){.cols{grid-template-columns:1fr}}
@@ -117,22 +118,6 @@
   .btn:disabled{opacity:.5;cursor:not-allowed}
   .btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 
-  /* structure preview */
-  .preview{
-    border:1px solid var(--line);border-radius:6px;padding:16px 18px;
-    max-height:55vh;overflow:auto;background:#fff;
-  }
-  .preview h2{font-size:18px;color:var(--hd-blue);border-bottom:1px solid var(--bg-soft);padding-bottom:4px}
-  .preview h3{font-size:15px;color:var(--hd-blue)}
-  .preview .cont_layout-standout{background:var(--bg-soft);border-radius:6px;padding:12px 16px;margin-bottom:14px}
-  .preview .cont_nav-index-table__double-col ul{columns:2}
-  .preview .cont_layout-media-object__icon-standout{
-    display:flex;gap:10px;align-items:flex-start;text-decoration:none;color:var(--hd-blue);
-    background:var(--bg-soft);border-left:4px solid var(--hd-green);padding:10px 14px;border-radius:4px;margin:10px 0;
-  }
-  .preview .cont_layout-media-object__icon-standout i{display:none}
-  .preview figure{border:1px dashed var(--line);padding:10px;border-radius:6px;color:var(--muted);font-size:13px}
-  .preview figcaption{font-size:12px;color:var(--muted);margin-top:4px}
 
   /* messages / report */
   .note{font-size:12.5px;color:var(--muted);margin:0 0 12px}
@@ -148,16 +133,6 @@
   ul.report li .what{font-weight:600}
   ul.report li code{font-family:var(--mono);font-size:12px;background:#f1f5f6;padding:1px 5px;border-radius:4px;word-break:break-all}
 
-  table.links{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px}
-  table.links th{text-align:left;background:#fafcfc;border-bottom:2px solid var(--line);padding:7px 8px;font-weight:700;position:sticky;top:0}
-  table.links td{border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:top}
-  table.links td.url{word-break:break-all}
-  table.links a{color:var(--hd-green)}
-  .scroll{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:6px}
-
-  .live-box{border:1px solid var(--line);border-radius:6px;padding:12px;background:#fbfdfd;margin-top:6px}
-  .live-box input[type=text]{width:100%;font-family:var(--mono);font-size:12px;padding:7px 9px;border:1px solid var(--line);border-radius:6px}
-  .live-box .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 
   .toast{
     position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
@@ -167,14 +142,50 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .stat{font-size:12px;color:var(--muted)}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-  details.help{margin-top:10px;font-size:12.5px;color:var(--muted)}
-  details.help summary{cursor:pointer;font-weight:600;color:var(--hd-blue)}
-  details.help p{margin:8px 0}
-  @media (prefers-reduced-motion:reduce){.toast{transition:none}}
+  /* structure preview (outline) */
+  .outline{border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:#fff;max-height:65vh;overflow:auto}
+  .outline ol{list-style:none;margin:0;padding:0}
+  .outline li{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px solid #eef3f4;font-size:13.5px}
+  .outline li:last-child{border-bottom:0}
+  .outline .tag{flex:none;min-width:44px;text-align:center;font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;background:#e6eef1;color:#2d4d5b}
+  .outline li.h1 .text{font-weight:700;font-size:15px}
+  .outline li.h2 .text{font-weight:700}
+  .outline .tag.kf{background:#e2f4f2;color:#0a6c64}
+  .outline .tag.cta{background:#fdf0e3;color:#8a4d12}
+  .outline .tag.em{background:#fbe3e4;color:#a23034}
+  .outline .tag.img{background:#f1f5f6;color:#5b7180}
+  .outline .id, .outline .detail{color:var(--muted);font-size:12px}
+  .outline .id{font-family:var(--mono)}
 
-  /* ---- Optimizely field segments ---- */
-  .opti-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:2px 0 10px}
-  .opti-controls label{font-size:13px;font-weight:600;color:var(--hd-blue)}
+  /* page fields */
+  .field{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:12px;background:#fff}
+  .field-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .field-head .label{font-size:13px;font-weight:700}
+  .field-head .spacer{flex:1}
+  .field-value{font-size:14px;background:#fbfdfd;border:1px solid var(--line);border-radius:4px;padding:8px 10px;word-break:break-word}
+  .field .empty{color:var(--muted);font-style:italic}
+  .meta-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;flex-wrap:wrap}
+  .meta-row .k{color:var(--muted);min-width:44px}
+  .meta-row .v{font-weight:600}
+  .meta-row code{font-family:var(--mono);font-size:12.5px;background:#f1f5f6;padding:1px 6px;border-radius:4px}
+  /* rich text view of a section (rough styling only) */
+  .rt{border:1px solid var(--line);border-radius:4px;padding:10px 14px;background:#fff;font-size:14px;max-height:45vh;overflow:auto}
+  .rt > :first-child{margin-top:0}
+  .rt > :last-child{margin-bottom:0}
+  .rt h3,.rt h4,.rt h5,.rt h6{color:var(--hd-blue);margin:14px 0 6px}
+  .rt p{margin:0 0 10px}
+  .rt ul{margin:0 0 10px;padding-left:22px}
+  .rt table{border-collapse:collapse;font-size:12.5px}
+  .rt td,.rt th{border:1px solid var(--line);padding:4px 6px;vertical-align:top}
+  .rt th{font-weight:700}
+  .rt .place{border:1px dashed var(--hd-orange);background:#fff7f2;border-radius:4px;padding:6px 10px;margin:0 0 10px;font-size:12.5px;color:#8a4d12}
+  .rt .place strong{font-weight:700}
+  .field .btnrow{margin-top:8px}
+  select.site{font:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;color:var(--ink);background:#fff;cursor:pointer}
+  select.site:focus-visible{outline:2px solid var(--hd-green);outline-offset:1px}
+  details.redirects{margin:0 0 12px;font-size:13px}
+  details.redirects summary{cursor:pointer;font-weight:600;color:var(--hd-blue)}
+  /* maintaining the redirect list */
   details.maintain{margin-top:16px;background:#fff}
   details.maintain > summary{cursor:pointer;font-size:14px;font-weight:700;padding:10px 14px;color:var(--hd-blue)}
   details.maintain > summary:focus-visible{outline:2px solid var(--hd-green);outline-offset:-2px}
@@ -183,26 +194,13 @@
   details.maintain input[type=file]{font:inherit;font-size:13px}
   ol.steps{font-size:13px;color:var(--muted);margin:0 0 4px;padding-left:22px}
   ol.steps li{margin-bottom:4px}
-  select.site{font:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:6px;color:var(--ink);background:#fff;cursor:pointer}
-  select.site:focus-visible{outline:2px solid var(--hd-green);outline-offset:1px}
-  .seg{border:1px solid var(--line);border-radius:6px;margin-bottom:12px;overflow:hidden}
-  .seg-head{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fafcfc;border-bottom:1px solid var(--line);flex-wrap:wrap}
-  .seg-title{font-weight:700;font-size:13px;color:var(--hd-blue)}
-  .seg-fields{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line)}
-  .seg-field{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .seg-flabel{font-size:12px;font-weight:700;color:var(--muted);min-width:40px}
-  .seg-fval{font-family:var(--mono);font-size:12px;background:#f1f5f6;padding:2px 6px;border-radius:4px;word-break:break-word;flex:1}
-  .seg-bodyhead{display:flex;align-items:center;gap:8px;padding:8px 10px;flex-wrap:wrap}
-  .seg-src{margin:0;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:12px;line-height:1.5;padding:10px 12px;background:#fbfdfd;max-height:32vh;overflow:auto;color:#173039}
-  .seg-callout{margin:8px 10px;padding:8px 12px;border-radius:8px;background:var(--bg-soft);border-left:4px solid var(--hd-green);font-size:12.5px;color:var(--hd-blue)}
-  .seg-callout .tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:var(--hd-green);color:#fff;border-radius:999px;padding:2px 8px;margin-right:6px}
-  .seg-callout .msg{margin-top:5px;color:var(--muted);line-height:1.4}
+  @media (prefers-reduced-motion:reduce){.toast{transition:none}}
 </style>
 </head>
 <body>
 <header class="app">
   <h1>Healthdirect Word → HTML converter</h1>
-  <p>Paste cleaned Word content (after you've actioned the writer's comments). The tool builds the page template, swaps in the approved call-to-action snippets, points links at their current URLs using the redirect list, and checks links for problems.</p>
+  <p>Paste cleaned Word content (after you've actioned the writer's comments). The tool builds the page template, swaps in the approved call-to-action snippets, points links at their current URLs using the redirect list, and splits the page into sections ready to paste into Optimizely. It handles both older Word documents and documents prepared with the maintenance-document-preparation skill.</p>
 </header>
 
 <div class="wrap">
@@ -222,6 +220,12 @@
     <div class="grp"><input type="checkbox" id="optKeyFacts" checked><label for="optKeyFacts">Build “Key facts” box</label></div>
     <div class="grp"><input type="checkbox" id="optImages" checked><label for="optImages">Convert [IMAGE] placeholders to figure</label></div>
     <div class="grp"><input type="checkbox" id="optQuotes" checked><label for="optQuotes">Straighten smart quotes (’ ” → ' ")</label></div>
+    <div class="grp"><label for="optDocType">Document type</label>
+      <select id="optDocType">
+        <option value="auto" selected>Auto-detect</option>
+        <option value="standard">Standard Word doc</option>
+        <option value="prepped">Prepped (maintenance skill)</option>
+      </select></div>
   </div>
 
   <div class="cols">
@@ -235,7 +239,7 @@
       </div>
       <div class="body">
         <div class="tabpane active" id="pane-word" role="tabpanel" aria-labelledby="tab-word">
-          <p class="note">Copy in Word (Ctrl/Cmd+C) → click below → paste (Ctrl/Cmd+V). Word’s styles are read directly, so headings, bullets and links are detected automatically.</p>
+          <p class="note">Copy in Word (Ctrl/Cmd+C) → click below → paste (Ctrl/Cmd+V). Word’s styles are read directly, so headings, bullets and links are detected automatically. Docs from the maintenance-document-preparation skill are recognised by their <code>[Meta title]</code> line — their meta title, description and sources go to the Page fields tab.</p>
           <div id="wordEditor" class="editor" contenteditable="true" spellcheck="false" data-ph="Paste your Word content here…"></div>
         </div>
         <div class="tabpane" id="pane-html" role="tabpanel" aria-labelledby="tab-html">
@@ -254,73 +258,34 @@
     <!-- OUTPUT -->
     <section class="panel" aria-label="Output">
       <div class="tabs" role="tablist">
-        <button role="tab" id="tab-opti" aria-selected="true" aria-controls="pane-opti">Optimizely fields <span id="optiCount" class="badge info" style="display:none"></span></button>
-        <button role="tab" id="tab-out" aria-selected="false" aria-controls="pane-out">HTML output</button>
+        <button role="tab" id="tab-fields" aria-selected="true" aria-controls="pane-fields">Page fields <span id="fieldCount" class="badge info" style="display:none"></span></button>
         <button role="tab" id="tab-prev" aria-selected="false" aria-controls="pane-prev">Structure preview</button>
-        <button role="tab" id="tab-links" aria-selected="false" aria-controls="pane-links">Link check <span id="linkCount" class="badge info" style="display:none"></span></button>
+        <button role="tab" id="tab-out" aria-selected="false" aria-controls="pane-out">HTML output</button>
       </div>
       <div class="body">
-        <!-- HTML output -->
-        <div class="tabpane" id="pane-out" role="tabpanel" aria-labelledby="tab-out">
-          <pre class="out" id="outCode" aria-live="polite">Your converted HTML will appear here.</pre>
-          <div class="btnrow">
-            <button class="btn primary" id="btnCopy" disabled>Copy HTML</button>
-            <button class="btn ghost" id="btnDownload" disabled>Download .html</button>
-            <span class="stat" id="reportStat"></span>
-          </div>
+        <!-- Page fields (primary output) -->
+        <div class="tabpane active" id="pane-fields" role="tabpanel" aria-labelledby="tab-fields">
+          <p class="stat" id="reportStat"></p>
           <div id="warnings"></div>
-        </div>
-
-        <!-- Preview -->
-        <div class="tabpane" id="pane-prev" role="tabpanel" aria-labelledby="tab-prev">
-          <p class="note">Quick structure check only — <strong>not</strong> Healthdirect’s real styling. Use it to confirm headings, bullets, snippets and order are right.</p>
-          <div class="preview" id="previewBox">Convert something to preview it.</div>
-        </div>
-
-        <!-- Link check -->
-        <div class="tabpane" id="pane-links" role="tabpanel" aria-labelledby="tab-links">
           <div id="redirectReport"></div>
-          <div id="staticReport"></div>
-
-          <details class="help" open>
-            <summary>About 404 / 301 checking</summary>
-            <p><strong>The checks above run instantly and need no internet.</strong> They catch your most common fixes: internal links left as full <code>healthdirect.gov.au</code> URLs (which 301-redirect), insecure <code>http://</code>, empty or placeholder links, broken on-page anchors, and external links missing <code>target="_blank"</code>.</p>
-            <p><strong>The live check below fetches every link through a proxy</strong> to find dead links (404) and links that now redirect somewhere else. Each link is checked one at a time with a short wait between requests, and each request times out on its own, so a long list won’t fire all at once or hang.</p>
-          </details>
-
-          <div class="live-box">
-            <div class="row">
-              <button class="btn small" id="btnLive">Run live check on all links</button>
-              <span class="stat" id="liveStat"></span>
-            </div>
-            <div class="row" style="margin-top:8px">
-              <label for="proxyUrl" style="font-size:12px;color:var(--muted);min-width:auto">Proxy</label>
-              <input type="text" id="proxyUrl" value="https://api.allorigins.win/get?url={url}">
-            </div>
-            <p class="note" style="margin:6px 0 0">Default proxy returns the real HTTP status and the final URL after any redirect. The <code>{url}</code> placeholder is replaced with each link. Wait between requests and per-request timeout are set below in the code if you want to change them.</p>
-          </div>
-
-          <div class="scroll" style="margin-top:12px">
-            <table class="links" id="linksTable">
-              <thead><tr><th>Link text</th><th>Link URL</th><th>Resolves to</th><th>Final URL (if redirected)</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
+          <div id="fieldsBox"><p class="note">Convert something to see the page fields.</p></div>
         </div>
 
-        <!-- Optimizely fields -->
-        <div class="tabpane active" id="pane-opti" role="tabpanel" aria-labelledby="tab-opti">
-          <p class="note">Content is split into one segment per H2, ready to paste into Optimizely rich text fields. Each section’s <strong>Title</strong> and <strong>ID</strong> are given separately from its body. <strong>Key facts</strong> copies as a bare <code>&lt;li&gt;</code> bullet list (paste as text). <strong>Standard callout boxes</strong> (Symptom Checker, Question Builder, etc.) are shared blocks — they aren’t copied as code; instead a note shows which block to drag in at the bottom of its section. <strong>Source references</strong> come out as a final bullet-list segment. Links to the site chosen at the top of the page are made <strong>relative</strong> so Optimizely resolves them to internal pages on paste; other links stay as full URLs and open in a new tab. Images are noted as text, not shown.</p>
-          <div id="optiSegments"><p class="note">Convert some content to see Optimizely field segments.</p></div>
-          <details class="help">
-            <summary>How to use these in Optimizely</summary>
-            <p><strong>Title / ID:</strong> paste these into the section’s heading and anchor-ID fields. The ID is auto-generated for now — a proper matched-ID list can be wired in later.</p>
-            <p><strong>Body — Copy for Optimizely</strong> puts the segment on your clipboard as rich content, so formatting and links come across; <strong>Copy source</strong> copies the raw HTML for the field’s HTML/source view. If a Copy button ever fails (some browsers block it on <code>file://</code>), use <strong>Select all</strong> and press Ctrl/Cmd+C.</p>
-            <p><strong>Key facts:</strong> the field takes only <code>&lt;li&gt;</code> items and pastes as text — use Copy source (or Copy for Optimizely) and paste into the list field.</p>
-            <p><strong>Callout boxes:</strong> the green note at the bottom of a section names the shared block to drag in there. Nothing to paste — it’s a placement reminder.</p>
-            <p><strong>Source references:</strong> formatted as “Organisation — Page name (link) (Authors)”. Built from the references table in your pasted content, so the page links are kept.</p>
-            <p>For a relative link to resolve to a page, the field must be on the matching site and the editor’s paste-time link handling must be switched on. If a link comes in as plain text, paste into the source view instead.</p>
-          </details>
+        <!-- Structure preview: outline only -->
+        <div class="tabpane" id="pane-prev" role="tabpanel" aria-labelledby="tab-prev">
+          <p class="note">An overview of the page: headings, the Key facts box, CTAs and images, in the order they appear.</p>
+          <div class="outline" id="previewBox"><p class="note">Convert something to preview it.</p></div>
+        </div>
+
+        <!-- Full HTML, only on request -->
+        <div class="tabpane" id="pane-out" role="tabpanel" aria-labelledby="tab-out">
+          <p class="note">The whole page as one HTML fragment (with the Key facts box and “On this page” nav). Only needed if you want the full page code.</p>
+          <div class="btnrow" style="margin-top:0;margin-bottom:12px">
+            <button class="btn primary" id="btnFullHtml" disabled>Generate full HTML</button>
+            <button class="btn ghost" id="btnCopy" disabled>Copy HTML</button>
+            <button class="btn ghost" id="btnDownload" disabled>Download .html</button>
+          </div>
+          <pre class="out" id="outCode" aria-live="polite">Convert something first, then press “Generate full HTML”.</pre>
         </div>
       </div>
     </section>
@@ -492,6 +457,274 @@ function cleanReferencesTable(html){
   return out;
 }
 
+/* Headings that start special sections (see convert()).
+   META_RE: SEO metadata sections — dropped from the body.
+   REF_RE:  "Source references" sections — kept out of the nav. */
+const META_RE = /^(meta\s*description|meta\s*data|metadata|page\s*description|seo(\s*description)?)\s*$/i;
+const REF_RE  = /^(sources?|references|source references?|reference list)\s*$/i;
+
+/* ---------- Prepped documents ----------
+   The maintenance-document-preparation skill outputs Word docs that start
+   with "[Meta title] …" and "[Meta description] …" lines, mark every heading
+   with [H1]/[H2]/[H3], and replace the sources table with a
+   "[Source references HTML]" line followed by the <ul> as plain text.
+   Any of these markers switches the converter into "prepped" mode:
+     • headings come ONLY from [Hn] markers (Word styles in these docs are
+       unreliable — e.g. bullets and body text styled "HLD H2")
+     • bullets come ONLY from real Word list numbering, not style names
+     • meta title, meta description, page title and the sources list go to
+       the "Page fields" tab, never into the body HTML                      */
+const PREPPED_RE      = /\[\s*(meta\s*title|meta\s*description|source\s*references?\s*html)\s*\]/i;
+const META_TITLE_RE   = /^\s*\[\s*meta\s*title\s*\]\s*([\s\S]*)$/i;
+const META_DESC_RE    = /^\s*\[\s*meta\s*description\s*\]\s*([\s\S]*)$/i;
+const SOURCES_HTML_RE = /^\s*\[\s*source\s*references?\s*html\s*\]\s*([\s\S]*)$/i;
+
+/* Soft length guides shown next to the meta fields (characters). */
+const META_TITLE_MAX = 60;
+const META_DESC_MAX  = 160;
+
+/* Clean the sources list that the prep skill wrote into the doc as plain text.
+   Keeps only the list text and its links; every link gets
+   target="_blank" rel="noopener" (attribute order href, target, rel).
+   Returns { html, count, problems } or null if no list was found.          */
+function cleanSourcesList(raw){
+  // Word's AutoFormat can curl the quotes around attribute values — undo that
+  // so the HTML still parses.
+  const fixed = raw.replace(/=\s*[\u201C\u201D]([^\u201C\u201D"]*)[\u201C\u201D]/g, '="$1"');
+  const d = new DOMParser().parseFromString(fixed, 'text/html');
+  const list = d.querySelector('ul, ol');
+  if (!list) return null;
+
+  const problems = [];
+  const inline = node => {
+    let out = '';
+    node.childNodes.forEach(ch => {
+      if (ch.nodeType === 3){ out += esc(straightenQuotes(ch.nodeValue.replace(/\u00a0/g, ' ').replace(/\s+/g, ' '))); return; }
+      if (ch.nodeType !== 1) return;
+      if (ch.tagName.toLowerCase() === 'a'){
+        const href = (ch.getAttribute('href') || '').trim();
+        const text = inline(ch).trim();
+        if (!/^https?:\/\//i.test(href)) problems.push(`Source link “${norm(ch.textContent)}” has an unexpected URL: ${href || '(empty)'}`);
+        out += `<a href="${escAttr(href)}" target="_blank" rel="noopener">${text}</a>`;
+      } else {
+        out += inline(ch);          // any other tag -> keep its text only
+      }
+    });
+    return out;
+  };
+
+  const items = Array.from(list.querySelectorAll(':scope > li')).map(li => {
+    if (!li.querySelector('a[href]')) problems.push(`Source has no link: “${norm(li.textContent)}”`);
+    return inline(li).replace(/\s{2,}/g, ' ').trim();
+  }).filter(Boolean);
+
+  if (!items.length) return null;
+  const html = '<ul>\n' + items.map(it => '    <li>' + it + '</li>').join('\n') + '\n</ul>\n';
+  return { html, count: items.length, problems };
+}
+
+/* ---------- Source references in older documents ----------
+   Older documents have a "Source references" table (Publisher / Page title /
+   Link), or sometimes a bullet list or plain lines. Each source becomes a
+   bullet in the same shape the prepped documents use:
+       Organisation — <a>Page name</a> (Authors)
+   The page name is linked to the source URL. */
+
+/* One reference link: this site's pages are relative, anything else is a full
+   URL that opens in a new tab. Old URLs are updated from the redirect list. */
+function refAnchor(href, text, opt){
+  const raw = (href || '').trim();
+  const label = esc(text || raw);
+  if (!raw) return label;
+  if (raw.startsWith('#') || /^(tel:|mailto:)/i.test(raw)) return `<a href="${escAttr(raw)}">${label}</a>`;
+  const link = resolveAndLogLink(raw, { site: opt.site, makeRelative: opt.relative, applyRedirects: opt.redirects });
+  if (link.openInNewTab) return `<a href="${escAttr(link.href)}" target="_blank" rel="noopener">${label}</a>`;
+  return `<a href="${escAttr(link.href)}">${label}</a>`;
+}
+
+/* Parse one reference into {org, pageName, url, authors}. Handles the shapes
+   writers actually use:
+     Organisation — Page name (Authors) (https://url)
+     Organisation — Page name (https://url)
+     Organisation — <a href="url">url or page name</a>
+   The URL may sit in a trailing "(https://…)", inside an <a>, or bare. */
+function parseRefItem(el){
+  const a = el.querySelector ? el.querySelector('a[href]') : null;
+  const anchorHref = a ? a.getAttribute('href') : '';
+  let text = straightenQuotes(norm(el.textContent)).replace(/^[•·●▪◦\u2013\u2014\-\s]+/, '');
+  if (!text) return null;
+
+  // Organisation — rest  (em dash, en dash, or a spaced hyphen)
+  let org = '', rest = text;
+  const dash = text.match(/^([\s\S]*?)\s*[\u2014\u2013]\s*([\s\S]*)$/) || text.match(/^([\s\S]*?)\s+-\s+([\s\S]*)$/);
+  if (dash){ org = dash[1].trim(); rest = dash[2].trim(); }
+
+  // URL: a "(https://…)" parenthetical wins, then an <a href>, then a bare URL.
+  let url = '';
+  const paren = rest.match(/\(\s*(https?:\/\/[^\s)]+)\s*\)/i);
+  if (paren){ url = paren[1]; rest = (rest.slice(0, paren.index) + rest.slice(paren.index + paren[0].length)).trim(); }
+  else if (anchorHref){ url = anchorHref; }
+  else { const bare = rest.match(/(https?:\/\/[^\s)]+)/i); if (bare){ url = bare[1]; rest = rest.replace(bare[0], '').trim(); } }
+
+  // Authors: a trailing non-URL parenthetical, e.g. "(Blagosklonny)".
+  let authors = '';
+  const ap = rest.match(/\(([^)]*)\)\s*$/);
+  if (ap && !/https?:\/\//i.test(ap[1])){ authors = ap[1].trim(); rest = rest.slice(0, ap.index).trim(); }
+
+  let pageName = rest.replace(/[\s\u2014\u2013-]+$/, '').trim();
+  if (!pageName) pageName = url;                       // link the URL itself when there's no title
+  if (!url && !pageName) return null;
+  return { org, pageName, url, authors };
+}
+
+/* One table row -> {org, pageName, url, authors, extra}. The references table
+   has a fixed layout:
+     col 0 = Publisher
+     col 1 = Page title (with any authors in a trailing "(…)")
+     col 2 = Link — a URL (plain text or an <a href>), or, for print-only
+             sources, edition/version details instead of a link. */
+function parseRefRow(tr){
+  const cells = Array.from(tr.children).filter(c => /^(td|th)$/i.test(c.tagName));
+  if (!cells.length) return null;
+  if (cells.every(c => c.tagName.toLowerCase() === 'th')) return null;
+  const cellTxt = c => straightenQuotes(norm(c ? c.textContent : ''));
+
+  const org  = cellTxt(cells[0]);
+  const c1   = cellTxt(cells[1]);
+  const c2el = cells[2];
+  const c2   = cellTxt(c2el);
+
+  // URL: prefer the <a href> in the Link cell; otherwise a bare URL in its text.
+  const a2 = c2el ? c2el.querySelector('a[href]') : null;
+  let url = a2 ? a2.getAttribute('href') : '';
+  if (!url){ const m = c2.match(/https?:\/\/\S+/i); if (m) url = m[0]; }
+
+  // Page title + trailing "(authors)" from the Page title cell.
+  let pageName = c1, authors = '';
+  const ap = c1.match(/\(([^)]*)\)\s*$/);
+  if (ap){ authors = ap[1].trim(); pageName = c1.slice(0, ap.index).trim(); }
+
+  // Print-only source: no link, so the Link cell holds edition/version detail.
+  const extra = (!url && c2 && !/^https?:/i.test(c2)) ? c2 : '';
+
+  if (!org && !pageName && !url) return null;
+  return { org, pageName: pageName || url, url, authors, extra };
+}
+
+/* Is this element a heading (real <h*>, a Word heading style, or an [Hn] line)? */
+function isRefStopHeading(el){
+  const tag = el.tagName.toLowerCase();
+  if (/^h[1-6]$/.test(tag)) return true;
+  if (/^\s*\[\s*H\s*[1-6]\s*\]/i.test(el.textContent || '')) return true;
+  return /\bh(?:ld)?h?[1-6]\b|head(?:ing)?\s*[1-6]/i.test(el.getAttribute('class') || '');
+}
+
+/* Find the "Source references" heading in the cleaned document and read
+   whatever follows it (a table, a bullet list or plain lines) until the next
+   heading. Returns {html, count} or null if there is nothing to read. */
+function buildLinkedSources(doc, opt){
+  const HEAD_RE = /^(organi[sz]ations?|authors?|titles?|sources?|references?|pages?|links?|names?|url)s?$/i;
+  const blocks = Array.from(doc.body.querySelectorAll('p,div,h1,h2,h3,h4,h5,h6,ul,ol,table'));
+
+  let headingIdx = -1;
+  for (let i = 0; i < blocks.length; i++){
+    const t = blocks[i].tagName.toLowerCase();
+    if (t === 'ul' || t === 'ol' || t === 'table') continue;
+    const label = norm(blocks[i].textContent).replace(/^\[\s*H\s*[1-6]\s*\]\s*/i, '');
+    if (REF_RE.test(label)){ headingIdx = i; break; }
+  }
+  if (headingIdx === -1) return null;
+
+  const parsed = [];
+  let taken = null;
+  for (let i = headingIdx + 1; i < blocks.length; i++){
+    const el = blocks[i];
+    if (taken && taken.contains(el)) continue;
+    taken = null;
+    if (isRefStopHeading(el)) break;
+    const tag = el.tagName.toLowerCase();
+    if (tag === 'ul' || tag === 'ol'){
+      Array.from(el.children).forEach(li => { if (li.tagName.toLowerCase() === 'li'){ const r = parseRefItem(li); if (r) parsed.push(r); } });
+      taken = el; continue;
+    }
+    if (tag === 'table'){
+      Array.from(el.querySelectorAll('tr')).forEach((tr, idx) => {
+        if (idx === 0 && !tr.querySelector('a[href]')){
+          const cells = Array.from(tr.children).filter(c => /^(td|th)$/i.test(c.tagName));
+          const t = cells.map(c => straightenQuotes(norm(c.textContent)));
+          const allTh = cells.length && cells.every(c => c.tagName.toLowerCase() === 'th');
+          const templateHeader = /^publisher$/i.test(t[0] || '') || /^page\s*title$/i.test(t[1] || '') || /^link\b/i.test(t[2] || '');
+          const labelHeader = cells.length >= 2 && t.every(x => !x || HEAD_RE.test(x));
+          if (allTh || templateHeader || labelHeader) return;   // header row
+        }
+        const r = parseRefRow(tr); if (r) parsed.push(r);
+      });
+      taken = el; continue;
+    }
+    if (tag === 'div' && el.querySelector('p,div,ul,ol,table,li')) continue;   // container — its children come next
+    const txt = norm(el.textContent);
+    if (!txt || HEAD_RE.test(txt)) continue;
+    const r = parseRefItem(el); if (r) parsed.push(r);
+  }
+
+  const items = parsed.map(r => {
+    let li = r.org ? esc(r.org) : '';
+    const linked = r.url ? refAnchor(r.url, r.pageName || r.url, opt) : esc(r.pageName || '');
+    if (linked){ li += (r.org ? ' — ' : ''); li += linked; }
+    if (r.authors && r.authors !== r.org && r.authors !== r.pageName) li += ` (${esc(r.authors)})`;
+    if (r.extra && r.extra !== r.pageName && r.extra !== r.authors) li += ` (${esc(r.extra)})`;
+    return '    <li>' + li + '</li>';
+  }).filter(li => !/^\s*<li>\s*<\/li>\s*$/.test(li));
+
+  if (!items.length) return null;
+  return { html: '<ul>\n' + items.join('\n') + '\n</ul>\n', count: items.length };
+}
+
+/* Pull the prepped-document fields out of the block list. Matched blocks are
+   marked 'drop' so they never reach the body HTML.                          */
+function extractPreppedFields(blocks, fields, warnings){
+  for (let i = 0; i < blocks.length; i++){
+    const b = blocks[i];
+    if (b.kind === 'drop' || b.text == null) continue;
+
+    let m = b.text.match(META_TITLE_RE);
+    if (m){
+      b.kind = 'drop';
+      if (!fields.metaTitle) fields.metaTitle = straightenQuotes(m[1].trim());
+      continue;
+    }
+    m = b.text.match(META_DESC_RE);
+    if (m){
+      b.kind = 'drop';
+      if (!fields.metaDescription) fields.metaDescription = straightenQuotes(m[1].trim());
+      continue;
+    }
+    m = b.text.match(SOURCES_HTML_RE);
+    if (m){
+      b.kind = 'drop';
+      // The HTML is normally the next paragraph (one long line). Collect
+      // paragraphs until the list closes, in case Word split it up.
+      let raw = m[1].trim();
+      for (let j = i + 1; j < blocks.length && !/<\/(ul|ol)>/i.test(raw); j++){
+        const nb = blocks[j];
+        if (nb.kind === 'h') break;
+        if (nb.text == null) continue;
+        if (!raw && !/^\s*</.test(nb.text)) break;   // marker not followed by HTML
+        raw += (raw ? ' ' : '') + nb.text;
+        nb.kind = 'drop';
+      }
+      const res = raw ? cleanSourcesList(raw) : null;
+      if (res){
+        fields.sourcesHtml = res.html;
+        fields.sourcesCount = res.count;
+        res.problems.forEach(p => warnings.push(['warn', p]));
+      } else {
+        warnings.push(['warn', 'Found a “[Source references HTML]” line but no <ul> list after it — add the sources by hand.']);
+      }
+    }
+  }
+}
+
 /* ---------- Heading -> id slug rules (Healthdirect standard) ---------- */
 const SLUG_RULES = [
   [/^what is\b/i,                  'what-is'],
@@ -529,33 +762,16 @@ const straightenQuotes = s => NORMALIZE_QUOTES
   ? s.replace(/[\u2018\u2019\u201A\u201B]/g, "'").replace(/[\u201C\u201D\u201E\u201F]/g, '"')
   : s;
 
-/* Sort a link into a kind, for the checks in the Link check tab. The site
-   matters: healthdirect.gov.au is an internal link on a healthdirect page and
-   the other site on a Pregnancy, Birth & Baby page.
-     internal    this page's own site
-     other-site  the other Healthdirect Australia site (or about.healthdirect)
-     external    any other website                                          */
-function normalizeLink(rawHref, site){
-  const href = (rawHref||'').trim();
-  if (!href || href === '#') return {kind:'empty', href};
-  if (href.startsWith('#'))   return {kind:'anchor', href};
-  if (/^tel:/i.test(href))    return {kind:'tel',    href};
-  if (/^mailto:/i.test(href)) return {kind:'mailto', href};
-  const link = readLinkUrl(href, site);
-  if (link === null)          return {kind:'external', href};
-  if (link.site === site)     return {kind:'internal', href, path: link.path};
-  return {kind:'other-site', href, path: link.path};
-}
-
-/* Render an <a>, applying the target/aria rule. */
+/* Render an <a>. resolveAndLogLink() (in the redirect-list script at the
+   bottom of this file) points the link at the page's current home and says
+   whether it leads away from the site being published to; those open in a
+   new tab. */
 function renderAnchor(rawHref, innerHtml, opt){
   const raw = (rawHref || '').trim();
   // An anchor with no usable destination (empty href, or a bare "#") is not a
   // real link — Word leaves these behind from bookmarks and fields. Unwrap it,
   // keeping only its inner content.
   if (!raw || raw === '#'){ return innerHtml; }
-  // Point the link at the page's current home, and find out whether it leads
-  // away from the site being published to.
   const link = resolveAndLogLink(raw, {
     site:           opt.site,
     makeRelative:   opt.relative,
@@ -589,12 +805,116 @@ function cleanInline(node, opt){
   });
   // Merge adjacent identical emphasis runs (Word fragments bold/italic text into
   // many runs); whitespace between the tags is preserved so words stay separated.
-  return out.replace(/<\/strong>(\s*)<strong>/g, '$1').replace(/<\/em>(\s*)<em>/g, '$1');
+  // Then unwrap emphasis that holds only punctuation (e.g. a bolded full stop).
+  return out.replace(/<\/strong>(\s*)<strong>/g, '$1').replace(/<\/em>(\s*)<em>/g, '$1')
+            .replace(/<(strong|em)>([.,;:!?]+)<\/\1>/g, '$2');
+}
+
+/* ---------- one block -> lines of HTML (used by the full HTML and the sections) ---------- */
+function renderBlock(b){
+  if (b.kind === 'h'){
+    if (b.level === 2 && b.id) return ['', `<h2 id="${b.id}">${b.html}</h2>`];
+    return ['', `<h${b.level}>${b.html}</h${b.level}>`];
+  }
+  if (b.kind === 'p')  return ['<p>' + b.html + '</p>'];
+  if (b.kind === 'ul') return ['<ul>', ...b.items.map(it => '    <li>' + it + '</li>'), '</ul>'];
+  if (b.kind === 'cta' || b.kind === 'figure' || b.kind === 'helpline' || b.kind === 'raw') return [b.html];
+  return [];
+}
+
+/* Names for the callout boxes, as shown in the outline and placement notes. */
+const CTA_NAMES = {
+  symptom:'Symptom Checker', serviceFinder:'Service Finder', questionBuilder:'Question Builder',
+  medicines:'Medicines information', painPlanner:'Pain Question Planner', opioid:'Opioid Risk Indicator',
+  bmi:'BMI Calculator', vaccination:'Vaccination booking (Service Finder)'
+};
+/* A [CTA] alert box counts as an emergency CTA if it mentions 000 / emergency. */
+const EMERGENCY_RE = /\b000\b|triple zero|emergency|ambulance|lifeline|13 ?11 ?14/i;
+
+function ctaLabel(b){
+  if (b.ctaKey === 'alert') return EMERGENCY_RE.test(b.ctaText || '') ? 'Emergency CTA' : 'CTA alert box';
+  return (CTA_NAMES[b.ctaKey] || 'Callout') + ' CTA';
+}
+
+/* Optimizely strips this attribute anyway, so it is left out of copied sections. */
+const forOptimizely = html => html.replace(/ aria-label="Link opens in a new tab"/g, '');
+
+/* Split the page into the sections shown in the Page fields tab:
+   content before the first H2, Key facts, one section per H2 and Source
+   references. Callouts and images become placement notes: shown in the
+   preview, but not part of the copied content.                          */
+function buildSections(docOrder, keyFacts, fields){
+  const sections = [];
+  const newSection = (kind, title, id) => ({kind, title, id: id || '', items: []});
+  let cur = newSection('intro', 'Before the first H2');
+  const flush = () => { if (cur.items.length) sections.push(cur); };
+
+  docOrder.forEach(b => {
+    if (b.kind === 'h1'){
+      // A "Source references" heading styled as H1 still starts its section.
+      if (b.isRef){ flush(); cur = newSection('refs', 'Source references'); }
+      return;
+    }
+    if (b.kind === 'keyfacts'){
+      flush();
+      const items = (keyFacts && keyFacts.items) || [];
+      sections.push({
+        kind:'keyfacts', title:'Key facts', id:'',
+        items: [{html: forOptimizely(['<ul>', ...items.map(it => '    <li>' + it + '</li>'), '</ul>'].join('\n'))}],
+        // Copy HTML gives the bare <li> items for the Key facts field.
+        copyHtml: forOptimizely(items.map(it => '<li>' + it + '</li>').join('\n'))
+      });
+      cur = newSection('intro', 'Before the first H2');
+      return;
+    }
+    if (b.kind === 'h' && b.level === 2){
+      flush();
+      cur = newSection(b.isRef ? 'refs' : 'h2', straightenQuotes(b.text), b.isRef ? '' : b.id);
+      return;
+    }
+    if (b.kind === 'cta'){
+      cur.items.push({note: ctaLabel(b), detail: b.ctaKey === 'alert' ? (b.ctaText || '') : ''});
+      return;
+    }
+    if (b.kind === 'figure'){ cur.items.push({note: 'Image'}); return; }
+    const html = renderBlock(b).filter(l => l !== '').join('\n');
+    if (html) cur.items.push({html: forOptimizely(html)});
+  });
+  flush();
+
+  // Prepped docs: the sources list goes in the Source references section
+  // (or a new one at the end if the doc had no such heading left).
+  if (fields && fields.sourcesHtml){
+    let refs = sections.find(s => s.kind === 'refs');
+    if (!refs){ refs = newSection('refs', 'Source references'); sections.push(refs); }
+    refs.items.push({html: fields.sourcesHtml.trim()});
+  }
+
+  // Content to copy = every item that isn't a placement note.
+  sections.forEach(s => {
+    if (!s.copyHtml) s.copyHtml = s.items.filter(it => it.html).map(it => it.html).join('\n');
+  });
+  return sections;
+}
+
+/* The Structure preview: headings, Key facts, CTAs and images only. */
+function buildOutline(docOrder, keyFacts){
+  const out = [];
+  docOrder.forEach(b => {
+    if (b.kind === 'h1') out.push({type:'heading', level:1, text: straightenQuotes(b.text)});
+    else if (b.kind === 'h') out.push({type:'heading', level:b.level, text: straightenQuotes(b.text), id: b.id || ''});
+    else if (b.kind === 'keyfacts') out.push({type:'keyfacts', text: 'Key facts box', detail: ((keyFacts && keyFacts.items.length) || 0) + ' points'});
+    else if (b.kind === 'cta') out.push({type: b.ctaKey === 'alert' && EMERGENCY_RE.test(b.ctaText || '') ? 'emergency' : 'cta',
+                                          text: ctaLabel(b), detail: b.ctaKey === 'alert' ? (b.ctaText || '') : ''});
+    else if (b.kind === 'figure') out.push({type:'image', text:'Image'});
+  });
+  return out;
 }
 
 /* ---------- core conversion ---------- */
 function convert(rawHtml, opt){
   const warnings = [];
+  clearRedirectLog();                 // start a fresh list of link rewrites
   NORMALIZE_QUOTES = opt.quotes !== false;
   const doc = new DOMParser().parseFromString(rawHtml, 'text/html');
 
@@ -610,6 +930,7 @@ function convert(rawHtml, opt){
   // <div style='mso-element:comment(-list)'> blocks and inline reference
   // markers in spans/anchors classed MsoCommentReference / msocomanchor, with
   // anchors pointing at #_msocom… / _msoanchor… targets.
+  const commentCount = doc.querySelectorAll('a.msocomanchor, a[href^="#_msocom"]').length;
   Array.from(doc.querySelectorAll('*')).forEach(el => {
     const style = el.getAttribute('style') || '';
     const cls = el.getAttribute('class') || '';
@@ -622,6 +943,25 @@ function convert(rawHtml, opt){
     }
   });
 
+  // Prepped document? (see PREPPED_RE near the top of the script)
+  // "Document type" option: auto-detect, or force either set of rules.
+  const docType = opt.docType || 'auto';
+  const prepped = docType === 'prepped' || (docType === 'auto' && PREPPED_RE.test(doc.body.textContent || ''));
+  if (prepped){
+    warnings.push(['info', 'Prepped document detected: headings were taken from the [H1]/[H2]/[H3] markers only, and bullets from Word’s list numbering only. Meta title, meta description, page title and source references are in the Page fields tab.']);
+  }
+
+  // Word draws each list bullet/number as a hidden span styled
+  // "mso-list:Ignore". Its presence is the reliable sign that a paragraph
+  // really shows a bullet in Word. Flag the paragraph, then remove the span so
+  // the bullet glyph (or "1.", "o" etc.) never leaks into the text.
+  doc.querySelectorAll('span[style]').forEach(s => {
+    if (!/mso-list:\s*ignore/i.test(s.getAttribute('style') || '')) return;
+    const para = s.closest('p, div, li, h1, h2, h3, h4, h5, h6');
+    if (para) para.setAttribute('data-word-list', '1');
+    s.remove();
+  });
+
   // Gather block-level elements in document order.
   const root = doc.body;
   const blocks = [];
@@ -629,6 +969,34 @@ function convert(rawHtml, opt){
     const c = (cls||'').toLowerCase();
     const m = c.match(/h(?:ld)?h?([123])\b/) || c.match(/head(?:ing)?\s*([123])\b/) || c.match(/\bh([123])\b/);
     return m ? +m[1] : 0;
+  }
+  const hasHeadingMarker = text => /^\s*\[\s*H\s*[1-6]\s*\]/i.test(text);
+
+  // One paragraph -> a heading, bullet or plain paragraph block.
+  function addParagraph(el, cls, style){
+    const text = norm(el.textContent);
+    if (!text){ return; } // drop empty paragraphs
+    const wordList = el.hasAttribute('data-word-list');
+    let headingLevel, isBullet;
+    if (prepped){
+      // Style names are not trusted here. [Hn] markers are applied later.
+      headingLevel = 0;
+      isBullet = wordList || /mso-list:\s*l\d/i.test(style) || /^[•·●▪◦]\s+/.test(text);
+    } else {
+      headingLevel = isHeadingClass(cls);
+      isBullet = /bullet|listparagraph/i.test(cls) || /mso-list/i.test(style) || wordList || /^[•·●▪◦\-]\s+/.test(text);
+      // A paragraph that shows a real Word bullet is a list item, even if its
+      // style name looks like a heading (e.g. bullets styled "HLD H3").
+      // [Hn]-marked lines are still promoted to headings later on.
+      if (headingLevel && wordList) headingLevel = 0;
+    }
+    if (headingLevel){ blocks.push({kind:'h', level:headingLevel, html: cleanInline(el, opt), text, cls}); return; }
+    if (isBullet){
+      let html = cleanInline(el, opt).replace(/^\s*[•·●▪◦\-]\s+/,'');
+      blocks.push({kind:'li', html, text: text.replace(/^\s*[•·●▪◦\-]\s+/,'')});
+      return;
+    }
+    blocks.push({kind:'p', html: cleanInline(el, opt), text});
   }
 
   function walk(parent){
@@ -643,25 +1011,21 @@ function convert(rawHtml, opt){
         return;
       }
       if (/^h[1-6]$/.test(tag)){
-        let lvl = +tag[1]; if (lvl > 3) lvl = 3;
-        blocks.push({kind:'h', level:lvl, html: cleanInline(el, opt), text: norm(el.textContent), cls});
+        const text = norm(el.textContent);
+        if (!text) return;   // empty heading line (e.g. a blank Heading 4)
+        // In a prepped doc a Word heading style only counts with an [Hn]
+        // marker (or for the "Source references" heading); otherwise it's
+        // treated like any other paragraph.
+        if (prepped && !hasHeadingMarker(text) && !REF_RE.test(text)){ addParagraph(el, cls, style); return; }
+        const lvl = +tag[1];
+        blocks.push({kind:'h', level:lvl, html: cleanInline(el, opt), text, cls});
         return;
       }
       if (tag === 'p' || tag === 'div'){
         // A <div> may just wrap paragraphs (Word/段) — recurse if it has element children but little direct text.
         const directText = Array.from(el.childNodes).filter(n=>n.nodeType===3).map(n=>n.nodeValue).join('').trim();
         if (tag === 'div' && el.children.length && !directText){ walk(el); return; }
-        const text = norm(el.textContent);
-        const headingLevel = isHeadingClass(cls);
-        const isBullet = /bullet|listparagraph/i.test(cls) || /mso-list/i.test(style) || /^[•·●▪◦\-]\s+/.test(text);
-        if (!text){ return; } // drop empty paragraphs
-        if (headingLevel){ blocks.push({kind:'h', level:headingLevel, html: cleanInline(el, opt), text, cls}); return; }
-        if (isBullet){
-          let html = cleanInline(el, opt).replace(/^\s*[•·●▪◦\-]\s+/,'');
-          blocks.push({kind:'li', html, text: text.replace(/^\s*[•·●▪◦\-]\s+/,'')});
-          return;
-        }
-        blocks.push({kind:'p', html: cleanInline(el, opt), text});
+        addParagraph(el, cls, style);
         return;
       }
       if (tag === 'table' || tag === 'figure' || tag === 'blockquote' || tag === 'img' || tag === 'a' || tag === 'nav'){
@@ -673,6 +1037,37 @@ function convert(rawHtml, opt){
     });
   }
   walk(root);
+
+  // Page fields that live outside the body HTML (filled for prepped docs;
+  // pageTitle is filled for any doc with an H1).
+  const fields = { prepped, metaTitle:'', metaDescription:'', pageTitle:'', sourcesHtml:'', sourcesCount:0 };
+  if (prepped){
+    try { extractPreppedFields(blocks, fields, warnings); }
+    catch (err){
+      console.error(err);
+      warnings.push(['warn', 'Could not read the meta/sources lines (' + err.message + '). They may appear in the body HTML — check the top and bottom of the output.']);
+    }
+    if (!fields.metaTitle)       warnings.push(['warn', 'Prepped document has no “[Meta title]” line.']);
+    if (!fields.metaDescription) warnings.push(['warn', 'Prepped document has no “[Meta description]” line.']);
+  }
+  // Older documents: turn the "Source references" table (or list) into the
+  // same linked bullet list. Prepped documents already have theirs.
+  let refList = null;
+  if (!fields.sourcesHtml){
+    try { refList = buildLinkedSources(doc, opt); }
+    catch (err){
+      console.error(err);
+      warnings.push(['warn', 'Could not turn the source references into a linked list (' + err.message + '). The original table is kept.']);
+    }
+    if (refList){
+      fields.sourcesHtml  = refList.html;
+      fields.sourcesCount = refList.count;
+      warnings.push(['info', `Source references: ${refList.count} source${refList.count !== 1 ? 's' : ''} turned into a linked bullet list. Check the page names and links.`]);
+    }
+  }
+  if (commentCount){
+    warnings.push(['info', `Removed ${commentCount} Word comment${commentCount !== 1 ? 's' : ''} from the pasted content — check ${commentCount !== 1 ? 'they were' : 'it was'} dealt with in the Word doc.`]);
+  }
 
   // A leading [Hn] marker is the writer's explicit heading level. Older docs
   // marked section headings this way — on plain paragraphs or even on
@@ -727,6 +1122,8 @@ function convert(rawHtml, opt){
         .replace(/^\s*\[\s*CTA\s*\]\s*/i, '')                         // then strip the [CTA] marker (now at the start)
         .trim();
       b.kind = 'cta';
+      b.ctaKey = 'alert';
+      b.ctaText = norm(inner.replace(/<[^>]+>/g, ''));
       b.html = buildAlert(inner);
     }
   });
@@ -774,21 +1171,7 @@ function convert(rawHtml, opt){
     // Image placeholder: [IMAGE], [[IMAGE]], [ IMAGE ] or [IMAGE*****] -> figure scaffold.
     if (opt.images && /^\[+[\s*]*image[\s*]*\]+$/i.test(b.text)){ b.kind = 'figure'; b.html = FIGURE_SNIPPET; return; }
     const cta = matchCTA(U);
-    if (cta){
-      b.kind = 'cta';
-      b.html = buildSnippet(cta, opt);
-      // The callout boxes are approved blocks, so their URLs are never changed.
-      // If one of them now redirects, say so and leave the decision to the
-      // content team.
-      const check = resolveLink('https://' + SITES.healthdirect + SNIPPETS[cta].path,
-                                { site: opt.site, applyRedirects: false });
-      if (check.to){
-        warnings.push(['warn', 'The “' + (CALLOUT_NAMES[cta] || cta) + '” callout links to '
-          + SNIPPETS[cta].path + ', which now redirects to ' + check.to
-          + '. The callout was left as it is — check whether the approved block needs updating.']);
-      }
-      return;
-    }
+    if (cta){ b.kind = 'cta'; b.ctaKey = cta; b.html = buildSnippet(cta, opt); return; }
     if (U.includes('HEALTHDIRECT HELPLINE') && U.replace(/\s/g,'').includes('1800022222')){ b.kind = 'helpline'; b.html = HELPLINE_HTML; return; }
     // A paragraph wrapped entirely in [[ ... ]] (tolerating spaces, e.g.
     // "[ [ … ] ]") is an unactioned writer instruction.
@@ -820,8 +1203,7 @@ function convert(rawHtml, opt){
   //    entirely so it never appears in the body or the "On this page" nav.
   //  • "Source references" — reference apparatus. Kept in the body but never
   //    listed in the nav; its table is cleaned to 3 plain-text columns.
-  const META_RE = /^(meta\s*description|meta\s*data|metadata|page\s*description|seo(\s*description)?)\s*$/i;
-  const REF_RE  = /^(sources?|references|source references?|reference list)\s*$/i;
+  //    (META_RE and REF_RE are defined near the top of the script.)
 
   // 1) Drop meta-description sections (heading + everything under it).
   const pruned = [];
@@ -837,13 +1219,22 @@ function convert(rawHtml, opt){
 
   // 2) In each "Source references" section: clean any table, mark the heading
   //    so it is kept out of the nav, and note whether the section has content.
+  let refListUsed = false;
   for (let i=0;i<pruned.length;i++){
     const b = pruned[i];
     if (!(b.kind === 'h' && REF_RE.test(b.text))) continue;
     b.isRef = true;
     let hasContent = false;
+    // The first references section is replaced by the linked list built above.
+    const replaceWithList = !!refList && !refListUsed;
+    if (replaceWithList) refListUsed = true;
     for (let j=i+1;j<pruned.length;j++){
       const nb = pruned[j];
+      if (replaceWithList){
+        if (nb.kind === 'h') break;                           // read up to the next heading
+        nb.kind = 'drop';
+        continue;
+      }
       if (nb.kind === 'h' && nb.level <= b.level) break;     // end of this section
       if (nb.kind === 'raw' && /^<table/i.test((nb.html||'').trim())){
         nb.html = cleanReferencesTable(nb.html);
@@ -852,6 +1243,8 @@ function convert(rawHtml, opt){
     }
     b.refEmpty = !hasContent;   // a lone references heading with nothing under it
   }
+  // Content replaced by the linked list is removed from the body.
+  for (let i = pruned.length - 1; i >= 0; i--) if (pruned[i].kind === 'drop') pruned.splice(i, 1);
 
   // Pull out the Key facts block; remove ALL H1 elements (the CMS supplies the
   // page title). The first H1 is remembered only for the on-screen stats.
@@ -860,10 +1253,12 @@ function convert(rawHtml, opt){
   const topBlocks = [];          // blocks that appear ABOVE the Key facts box
   const body = [];               // everything after Key facts
 
+  const docOrder = [];   // H1s, the key facts position and every kept block, in document order
   for (let i=0;i<pruned.length;i++){
     const b = pruned[i];
-    if (b.kind === 'h' && b.level === 1){      // drop every H1, always
+    if (b.kind === 'h' && b.level === 1){      // drop every H1 from the body, always
       if (!titleText) titleText = b.text;
+      docOrder.push({kind:'h1', text: b.text, isRef: REF_RE.test(b.text)});
       continue;
     }
     if (b.isRef && b.refEmpty){ continue; }     // lone "Source references" heading, nothing under it
@@ -872,10 +1267,12 @@ function convert(rawHtml, opt){
       const next = pruned[i+1];
       if (next && next.kind === 'ul'){ keyFacts = {items: next.items}; i++; }
       else { keyFacts = {items: []}; warnings.push(['warn','“Key facts” heading found but no bullet list followed it.']); }
+      docOrder.push({kind:'keyfacts'});
       continue;
     }
     // Before the Key facts box -> stays at the top; after it -> normal body.
     (keyFacts ? body : topBlocks).push(b);
+    docOrder.push(b);
   }
   // No Key facts box means nothing is "above" it — treat everything as body.
   if (!keyFacts){ body.unshift(...topBlocks); topBlocks.length = 0; }
@@ -897,21 +1294,7 @@ function convert(rawHtml, opt){
 
   // ---- assemble fragment ----
   const parts = [];
-  const renderBlocks = list => list.forEach(b => {
-    if (b.kind === 'h'){
-      parts.push('');
-      if (b.level === 2 && b.id) parts.push(`<h2 id="${b.id}">${b.html}</h2>`);
-      else parts.push(`<h${b.level}>${b.html}</h${b.level}>`);
-    } else if (b.kind === 'p'){
-      parts.push('<p>' + b.html + '</p>');
-    } else if (b.kind === 'ul'){
-      parts.push('<ul>');
-      b.items.forEach(it => parts.push('    <li>' + it + '</li>'));
-      parts.push('</ul>');
-    } else if (b.kind === 'cta' || b.kind === 'figure' || b.kind === 'helpline' || b.kind === 'raw'){
-      parts.push(b.html);
-    }
-  });
+  const renderBlocks = list => list.forEach(b => parts.push(...renderBlock(b)));
 
   renderBlocks(topBlocks);                       // anything above Key facts stays above it
   if (keyFacts){
@@ -947,78 +1330,14 @@ function convert(rawHtml, opt){
     nav: navItems.length
   };
 
-  return {html, warnings, stats, titleText};
-}
+  fields.pageTitle = straightenQuotes(titleText);
+  stats.sources = fields.sourcesCount;
 
-/* ---------- link extraction + static validation ---------- */
+  const sections = buildSections(docOrder, keyFacts, fields);
+  const outline  = buildOutline(docOrder, keyFacts);
+  stats.sections = sections.length;
 
-/* Relative links are checked live as absolute URLs under the site the page is
-   being published to, so "/bowel-cancer-screening" on a healthdirect page is
-   tested as "https://www.healthdirect.gov.au/bowel-cancer-screening". */
-function linkCheckBase(site){
-  return 'https://' + SITES[site || currentSite()];
-}
-
-function analyseLinks(html, site){
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const ids = new Set(Array.from(doc.querySelectorAll('[id]')).map(e=>e.id));
-  const issues = [];
-  const rows = [];
-  const seenText = {};
-
-  doc.querySelectorAll('a[href]').forEach(a => {
-    const href = a.getAttribute('href') || '';
-    const text = norm(a.textContent) || '(no text)';
-    const hasTarget = a.getAttribute('target') === '_blank';
-    const L = normalizeLink(href, site); // classify only
-
-    let type = L.kind, abs = href, resolves = true;
-    if (L.kind === 'internal'){
-      abs = href.startsWith('/') ? linkCheckBase(site) + href : href;
-    }
-
-    // checks
-    if (L.kind === 'empty'){ issues.push(['err', text, 'Empty or placeholder link', href]); resolves=false; }
-    if (/\{\{|\}\}/.test(href)){ issues.push(['err', text, 'Unfinished placeholder in URL', href]); resolves=false; }
-    // A link to this page's own site should be relative, unless it is one of
-    // the pages that always needs its full URL (Symptom Checker and friends).
-    if (L.kind === 'internal' && /^https?:\/\//i.test(href) && !needsFullUrl(site, L.path)){
-      issues.push(['warn', text, 'Link to this site uses the full domain → will 301. Make it relative.', href]);
-    }
-    // Still pointing at an old URL? Only possible with "Update old URLs" off.
-    if (L.kind === 'internal' || L.kind === 'other-site'){
-      const moved = resolveLink(href, { site: site, applyRedirects: false });
-      if (moved.to){ issues.push(['warn', text, 'This URL redirects — it should be ' + moved.to, href]); }
-    }
-    if (/^http:\/\//i.test(href)){ issues.push(['warn', text, 'Insecure http:// link', href]); }
-    if (/\s/.test(href.trim()) && !href.startsWith('#')){ issues.push(['warn', text, 'URL contains a space', href]); }
-    if (L.kind === 'anchor'){ const target = href.slice(1); if (target && !ids.has(target) && target !== 'searchGeneralResults'){ issues.push(['err', text, 'On-page anchor has no matching id', href]); resolves=false; } }
-    if ((L.kind === 'external' || L.kind === 'other-site') && !hasTarget){ issues.push(['warn', text, 'Link to another site is missing target="_blank" / aria-label', href]); }
-    // A link to this site shouldn't open in a new tab — except for the tools
-    // that sit outside the CMS, which the approved callouts do open in one.
-    if ((L.kind === 'tel' || (L.kind === 'internal' && !needsFullUrl(site, L.path))) && hasTarget){
-      issues.push(['warn', text, 'Link to this site should not open in a new tab', href]);
-    }
-    // A bare path on Pregnancy, Birth & Baby is taken to be a page on that
-    // site. If it is also an old healthdirect URL, it is probably a
-    // healthdirect link that lost its domain along the way.
-    if (L.kind === 'internal' && href.startsWith('/') && site !== 'healthdirect'
-        && findRedirect('healthdirect', L.path)){
-      issues.push(['info', text, 'This path is an old healthdirect URL, so it may be meant for healthdirect rather than this site', href]);
-    }
-    // duplicate text -> different URL
-    const key = text.toLowerCase();
-    if (seenText[key] && seenText[key] !== href){ issues.push(['info', text, 'Same link text points to a different URL elsewhere', href]); }
-    seenText[key] = href;
-
-    rows.push({text, href, abs, type, resolves});
-  });
-
-  // de-dupe rows by href for the table
-  const uniq = []; const seen = new Set();
-  rows.forEach(r => { if (!seen.has(r.href)){ seen.add(r.href); uniq.push(r); } });
-
-  return {issues, rows: uniq, total: rows.length};
+  return {html, warnings, stats, titleText, fields, sections, outline, redirects: uniqueRedirects(redirectLog)};
 }
 
 /* =====================================================================
@@ -1026,24 +1345,19 @@ function analyseLinks(html, site){
    ===================================================================== */
 const $ = sel => document.querySelector(sel);
 let lastWordPaste = null;   // raw text/html captured from the last Word paste
-let currentHtml = '';
-let currentLinks = null;
-let lastConvertInput = '';  // raw input of the last conversion (to rebuild Optimizely segments)
-
-/* The site this page will be published on: 'healthdirect' or 'pbb'. */
-function currentSite(){
-  return $('#optSite').value;
-}
+let lastResult = null;      // result of the last successful conversion
+let currentHtml = '';       // full HTML, only filled when "Generate full HTML" is pressed
 
 function opts(){
   return {
-    site:      currentSite(),
-    redirects: $('#optRedirects').checked,
+    site:     $('#optSite').value,          // 'healthdirect' | 'pbb'
+    redirects:$('#optRedirects').checked,
     relative: $('#optRelative').checked,
     nav:      $('#optNav').checked,
     keyFacts: $('#optKeyFacts').checked,
     images:   $('#optImages').checked,
     quotes:   $('#optQuotes').checked,
+    docType:  $('#optDocType').value,     // 'auto' | 'standard' | 'prepped'
   };
 }
 
@@ -1059,7 +1373,7 @@ function wireTabs(ids){
   }));
 }
 wireTabs(['tab-word','tab-html']);
-wireTabs(['tab-opti','tab-out','tab-prev','tab-links']);
+wireTabs(['tab-fields','tab-prev','tab-out']);
 
 /* capture raw Word HTML on paste (preserves Word's style classes) */
 const wordEditor = $('#wordEditor');
@@ -1102,19 +1416,140 @@ function toast(msg){
   clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove('show'), 1800);
 }
 
-/* List the links that were pointed at a new URL, one line per URL. */
-function renderRedirectReport(changes){
-  const box = $('#redirectReport');
-  if (!changes.length){ box.innerHTML = ''; return; }
-
-  let out = `<p class="note"><span class="badge ok">${changes.length} link${changes.length>1?'s':''} updated</span> `
-          + `from the redirect list.</p><ul class="report">`;
-  changes.forEach(c => {
-    out += `<li><span class="badge info">updated</span> <code>${esc(c.from)}</code><br>`
-         + `→ <code>${esc(c.to)}</code></li>`;
-  });
-  box.innerHTML = out + '</ul>';
+/* ---------- copying ----------
+   Both copy functions write the exact string to the clipboard through a
+   copy-event override, so relative links like "/fatigue" stay relative
+   (copying from the page itself would turn them into file:/// links).
+   If that fails, the async Clipboard API is tried instead.               */
+function copyViaEvent(data){
+  let handled = false;
+  const onCopy = e => {
+    Object.keys(data).forEach(type => e.clipboardData.setData(type, data[type]));
+    e.preventDefault();
+    handled = true;
+  };
+  document.addEventListener('copy', onCopy, true);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (err) { ok = false; }
+  document.removeEventListener('copy', onCopy, true);
+  return ok && handled;
 }
+
+/* Rich text: pastes into Optimizely's editor as formatted content. */
+async function copyRich(html, label){
+  const plain = new DOMParser().parseFromString(html, 'text/html').body.textContent.replace(/\n{3,}/g, '\n\n').trim();
+  if (copyViaEvent({'text/html': html, 'text/plain': plain})){ toast(label + ' copied'); return; }
+  try {
+    await navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([html],  {type:'text/html'}),
+      'text/plain': new Blob([plain], {type:'text/plain'})
+    })]);
+    toast(label + ' copied');
+  } catch (err) {
+    toast('Copy failed — use “Copy HTML” and paste into the source view');
+  }
+}
+
+/* Plain text: the HTML source, a title or an ID. */
+async function copyPlain(text, label){
+  if (copyViaEvent({'text/plain': text})){ toast(label + ' copied'); return; }
+  try { await navigator.clipboard.writeText(text); toast(label + ' copied'); }
+  catch (err) { toast('Copy failed — select the text and copy it by hand'); }
+}
+
+/* ---------- Page fields (primary output) ---------- */
+const META_FIELDS = [
+  {key:'pageTitle',       label:'Page title (H1)'},
+  {key:'metaTitle',       label:'Meta title',       max: META_TITLE_MAX},
+  {key:'metaDescription', label:'Meta description', max: META_DESC_MAX},
+];
+const SECTION_TAGS = {intro:'Content', keyfacts:'Key facts', h2:'H2', refs:'Sources'};
+
+let copyStore = [];   // strings the Copy buttons point at (by index)
+const addCopy = (value, kind, label) => {
+  copyStore.push({value, kind, label});
+  return `<button class="btn small ghost" data-copy="${copyStore.length - 1}"${value ? '' : ' disabled'}>${kind === 'rich' ? 'Copy for Optimizely' : kind === 'html' ? 'Copy HTML' : 'Copy'}</button>`;
+};
+
+function renderFields(res){
+  copyStore = [];
+  const f = res.fields;
+  let out = '';
+
+  // Meta fields: all three for prepped docs, only what was found otherwise.
+  META_FIELDS.filter(m => f.prepped || f[m.key]).forEach(m => {
+    const val = f[m.key] || '';
+    let badge = '';
+    if (m.max && val){
+      const n = val.length;
+      badge = `<span class="badge ${n > m.max ? 'warn' : 'ok'}">${n} characters${n > m.max ? ' — over ' + m.max : ''}</span>`;
+    }
+    out += `<div class="field"><div class="field-head"><span class="label">${m.label}</span>${badge}<span class="spacer"></span>${addCopy(val, 'text', m.label)}</div>`
+         + (val ? `<div class="field-value">${esc(val)}</div>` : '<div class="field-value empty">Not found in the pasted content.</div>')
+         + `</div>`;
+  });
+
+  // One card per section, in page order (matches the Structure preview).
+  res.sections.forEach(sec => {
+    const view = sec.items.map(it => it.html
+      ? it.html
+      : `<div class="place"><strong>▸ Add ${esc(it.note)} here</strong>${it.detail ? ' — ' + esc(it.detail) : ''}</div>`
+    ).join('\n');
+
+    let head = `<span class="badge info">${SECTION_TAGS[sec.kind] || 'Section'}</span>`;
+    let meta = '';
+    if (sec.kind === 'h2' || sec.kind === 'refs'){
+      meta += `<div class="meta-row"><span class="k">Title</span><span class="v">${esc(sec.title)}</span>${addCopy(sec.title, 'text', 'Title')}</div>`;
+      if (sec.id) meta += `<div class="meta-row"><span class="k">ID</span><code>${esc(sec.id)}</code>${addCopy(sec.id, 'text', 'ID')}</div>`;
+    } else {
+      head += ` <span class="label">${esc(sec.title)}</span>`;
+    }
+    out += `<div class="field"><div class="field-head">${head}</div>${meta}`
+         + `<div class="rt">${view || '<p class="empty">No content.</p>'}</div>`
+         + `<div class="btnrow">${addCopy(sec.copyHtml, 'rich', sec.title)}${addCopy(sec.copyHtml, 'html', sec.title + ' HTML')}</div>`
+         + `</div>`;
+  });
+
+  $('#fieldsBox').innerHTML = out || '<p class="note">No page fields found in this content.</p>';
+  const fc = $('#fieldCount');
+  fc.style.display = res.sections.length ? '' : 'none';
+  fc.textContent = res.sections.length;
+}
+
+$('#fieldsBox').addEventListener('click', e => {
+  // Links in the preview don't go anywhere (relative links would open file:// pages).
+  if (e.target.closest('.rt a')){ e.preventDefault(); return; }
+  const btn = e.target.closest('button[data-copy]');
+  if (!btn) return;
+  const item = copyStore[+btn.dataset.copy];
+  if (!item || !item.value) return;
+  if (item.kind === 'rich') copyRich(item.value, item.label);
+  else copyPlain(item.value, item.label);
+});
+
+/* ---------- Structure preview (outline only) ---------- */
+function renderOutline(outline){
+  if (!outline.length){ $('#previewBox').innerHTML = '<p class="note">No headings, CTAs or images found.</p>'; return; }
+  let level = 1;                                   // indent markers under the heading they sit in
+  const rows = outline.map(o => {
+    let tag, cls = '', indent;
+    if (o.type === 'heading'){ level = o.level; indent = o.level - 1; tag = 'H' + o.level; cls = 'h' + o.level; }
+    else {
+      indent = level;
+      tag = o.type === 'keyfacts' ? 'KEY FACTS' : o.type === 'emergency' ? 'EMERGENCY' : o.type === 'image' ? 'IMAGE' : 'CTA';
+    }
+    const tagCls = o.type === 'keyfacts' ? 'kf' : o.type === 'emergency' ? 'em' : o.type === 'image' ? 'img' : o.type === 'cta' ? 'cta' : '';
+    return `<li class="${cls}" style="padding-left:${indent * 18}px">`
+         + `<span class="tag ${tagCls}">${tag}</span>`
+         + `<span class="text">${esc(o.text)}</span>`
+         + (o.id ? ` <span class="id">#${esc(o.id)}</span>` : '')
+         + (o.detail ? ` <span class="detail">${esc(o.detail.length > 90 ? o.detail.slice(0, 90) + '…' : o.detail)}</span>` : '')
+         + `</li>`;
+  });
+  $('#previewBox').innerHTML = '<ol>' + rows.join('') + '</ol>';
+}
+
+/* ---------- redirect report ---------- */
 
 /* The same URL is often linked several times — list it once. */
 function uniqueRedirects(list){
@@ -1127,586 +1562,106 @@ function uniqueRedirects(list){
   return out;
 }
 
-/* render the static link report */
-function renderStaticReport(analysis){
-  const box = $('#staticReport');
-  if (!analysis.total){ box.innerHTML = '<p class="note">No links found.</p>'; return; }
-  const errs = analysis.issues.filter(i=>i[0]==='err');
-  const warns = analysis.issues.filter(i=>i[0]==='warn');
-  const infos = analysis.issues.filter(i=>i[0]==='info');
-  let head = `<p class="note">${analysis.total} link${analysis.total>1?'s':''} found `;
-  head += `<span class="badge err">${errs.length} errors</span> `;
-  head += `<span class="badge warn">${warns.length} warnings</span> `;
-  head += `<span class="badge info">${infos.length} notes</span></p>`;
-  let list = '';
-  if (analysis.issues.length){
-    list = '<ul class="report">';
-    analysis.issues.forEach(([lvl, text, what, href]) => {
-      const b = lvl==='err'?'err':lvl==='warn'?'warn':'info';
-      list += `<li><span class="badge ${b}">${lvl}</span> <span class="what">${esc(what)}</span><br>`
-            + `“${esc(text)}” → <code>${esc(href)}</code></li>`;
-    });
-    list += '</ul>';
-  } else {
-    list = '<p class="note"><span class="badge ok">clean</span> No static issues detected.</p>';
+/* List the links that were pointed at a new URL, one entry per URL. */
+function renderRedirectReport(changes){
+  const box = $('#redirectReport');
+  if (!changes || !changes.length){ box.innerHTML = ''; return; }
+  box.innerHTML = '<details class="redirects"><summary><span class="badge ok">' + changes.length
+    + ' link' + (changes.length > 1 ? 's' : '') + ' updated</span> from the redirect list — show</summary>'
+    + '<ul class="report" style="margin-top:8px">'
+    + changes.map(c => '<li><code>' + esc(c.from) + '</code><br>→ <code>' + esc(c.to) + '</code></li>').join('')
+    + '</ul></details>';
+}
+
+/* ---------- conversion ---------- */
+
+/* Convert without ever leaving the page in a broken state.
+   1. Try with the chosen options.
+   2. If that fails while using the prepped rules, retry with the standard rules.
+   3. If it still fails, show the error and stop.                          */
+function safeConvert(input, o){
+  try { return convert(input, o); }
+  catch (err){
+    console.error(err);
+    if (o.docType !== 'standard'){
+      try {
+        const res = convert(input, Object.assign({}, o, {docType:'standard'}));
+        res.warnings.unshift(['warn', 'The prepped-document rules failed (' + err.message + '), so this was converted with the standard rules instead. Check headings, bullets and the meta lines by hand.']);
+        return res;
+      } catch (err2){ console.error(err2); err = err2; }
+    }
+    $('#fieldsBox').innerHTML = '<p class="note"><span class="badge err">error</span> Conversion failed: ' + esc(err.message)
+      + '. Nothing was changed. Try “Paste HTML / text”, or set Document type to the other option.</p>';
+    $('#tab-fields').click();
+    toast('Conversion failed');
+    return null;
   }
-  box.innerHTML = head + list;
 }
 
-function renderLinksTable(rows){
-  const tb = $('#linksTable').querySelector('tbody');
-  tb.innerHTML = '';
-  // Only show links that can actually be tested. Anchors (#…), tel: and
-  // mailto: links have nothing to fetch, so they are left out entirely.
-  const testable = rows.filter(r => /^https?:\/\//i.test(r.abs) || r.abs.startsWith('/'));
-  if (!testable.length){
-    tb.innerHTML = '<tr><td colspan="4" class="muted" style="padding:10px">No testable links in this content.</td></tr>';
-    return;
+/* Build one output panel; if it fails, say so in that panel and carry on. */
+function safePanel(name, fn, box){
+  try { fn(); }
+  catch (err){
+    console.error(err);
+    if (box) box.innerHTML = '<p class="note"><span class="badge err">error</span> ' + esc(name) + ' could not be built: ' + esc(err.message) + '</p>';
   }
-  testable.forEach(r => {
-    const absUrl = /^https?:/i.test(r.abs) ? r.abs : linkCheckBase() + r.abs;
-    const tr = document.createElement('tr');
-    tr.dataset.abs = absUrl;
-    tr.innerHTML =
-        `<td>${esc(r.text)}</td>`
-      + `<td class="url"><a href="${escAttr(absUrl)}" target="_blank" rel="noopener">${esc(r.href)}</a></td>`
-      + `<td class="resolveCell"><span class="muted">not checked</span></td>`
-      + `<td class="finalCell"><span class="muted">—</span></td>`;
-    tb.appendChild(tr);
-  });
 }
 
-/* =====================================================================
-   Optimizely field output
-   Splits the converted content into one copyable segment per H2 and
-   rewrites links so they resolve as internal pages in Optimizely. The
-   segments are built from a fresh conversion with ABSOLUTE links, then
-   links to the chosen site are made relative here — this keeps the
-   direction right whichever site the page belongs to.
-   ===================================================================== */
-
-/* Rewrite every anchor in the doc for the target site:
-     • link to THIS site -> root-relative path (internal page), no new tab
-     • link to elsewhere  -> left as a full URL, opens in a new tab
-   Old URLs are swapped for their current ones at the same time. tel:, mailto:
-   and on-page (#) links are left alone. aria-label goes either way, because
-   Optimizely strips it on paste. */
-function rewriteLinksForSite(doc, site){
-  doc.querySelectorAll('a[href]').forEach(a => {
-    const raw = (a.getAttribute('href') || '').trim();
-    if (!raw || raw.startsWith('#') || /^(tel:|mailto:)/i.test(raw)) return;
-
-    const link = resolveLink(raw, { site: site, applyRedirects: $('#optRedirects').checked });
-    a.setAttribute('href', link.href);
-    a.removeAttribute('aria-label');
-
-    if (link.openInNewTab){
-      a.setAttribute('target', '_blank');
-    } else {
-      a.removeAttribute('target'); a.removeAttribute('rel');
-    }
-  });
+function resetHtmlTab(enabled){
+  currentHtml = '';
+  $('#outCode').textContent = enabled ? 'Press “Generate full HTML” to build the whole page as one fragment.' : 'Convert something first, then press “Generate full HTML”.';
+  $('#btnFullHtml').disabled = !enabled;
+  $('#btnCopy').disabled = true;
+  $('#btnDownload').disabled = true;
 }
 
-/* A text-only note that stands in for an image (noted, never displayed). */
-function imageNoteNode(doc, caption){
-  const p = doc.createElement('p');
-  const strong = doc.createElement('strong');
-  strong.textContent = (caption && caption.toUpperCase() !== 'CAPTION')
-    ? '[IMAGE — add in Optimizely] ' + caption
-    : '[IMAGE — add in Optimizely]';
-  p.appendChild(strong);
-  return p;
-}
-
-/* Friendly names for the standard callout boxes (the shared Optimizely blocks).
-   Keyed by the snippet key that matchCTA() returns from the callout's text. */
-const CALLOUT_NAMES = {
-  symptom:        'Symptom Checker',
-  questionBuilder:'Question Builder',
-  serviceFinder:  'Service Finder',
-  medicines:      'Medicines information',
-  painPlanner:    'Pain Question Planner',
-  opioid:         'Opioid Risk Indicator',
-  bmi:            'BMI Calculator',
-  vaccination:    'Service Finder (flu vaccination)'
-};
-/* Is this top-level node a standard callout box? Returns {name, text} or null. */
-function calloutInfo(node){
-  if (node.nodeType !== 1) return null;
-  const isBox = node.tagName.toLowerCase() === 'a'
-    && /cont_layout-media-object__icon-standout/.test(node.getAttribute('class') || '');
-  if (!isBox) return null;
-  const text = norm(node.textContent);
-  const key = matchCTA(text.toUpperCase());
-  return { name: (key && CALLOUT_NAMES[key]) || 'Callout', text };
-}
-
-/* Rewrite one reference link for the target site (same rules as the body):
-   this-site -> relative internal path; anything else -> full URL + new tab. */
-function refAnchor(href, text, site){
-  const raw = (href || '').trim();
-  const label = esc(text || raw);
-  if (!raw) return label;
-  if (raw.startsWith('#') || /^(tel:|mailto:)/i.test(raw)) return `<a href="${escAttr(raw)}">${label}</a>`;
-
-  const link = resolveLink(raw, { site: site, applyRedirects: $('#optRedirects').checked });
-  if (link.openInNewTab) return `<a href="${escAttr(link.href)}" target="_blank" rel="noopener">${label}</a>`;
-  return `<a href="${escAttr(link.href)}">${label}</a>`;
-}
-
-/* Parse one reference into {org, pageName, url, authors} from an element's text
-   plus any link it carries. Handles the shapes writers actually use:
-     Organisation — Page name (Authors) (https://url)
-     Organisation — Page name (https://url)
-     Organisation — <a href="url">url or page name</a>
-   The URL may sit in a trailing "(https://…)", inside an <a>, or bare. The
-   page name is whatever descriptive text is left; if there is none, the URL is
-   used as the link text. Authors are a non-URL parenthetical. */
-function parseRefItem(el){
-  const a = el.querySelector ? el.querySelector('a[href]') : null;
-  const anchorHref = a ? a.getAttribute('href') : '';
-  let text = straightenQuotes(norm(el.textContent)).replace(/^[•·●▪◦\u2013\u2014\-\s]+/, '');
-  if (!text) return null;
-
-  // Organisation — rest  (em dash, en dash, or a spaced hyphen)
-  let org = '', rest = text;
-  const dash = text.match(/^([\s\S]*?)\s*[\u2014\u2013]\s*([\s\S]*)$/) || text.match(/^([\s\S]*?)\s+-\s+([\s\S]*)$/);
-  if (dash){ org = dash[1].trim(); rest = dash[2].trim(); }
-
-  // URL: a "(https://…)" parenthetical wins, then an <a href>, then a bare URL.
-  let url = '';
-  const paren = rest.match(/\(\s*(https?:\/\/[^\s)]+)\s*\)/i);
-  if (paren){ url = paren[1]; rest = (rest.slice(0, paren.index) + rest.slice(paren.index + paren[0].length)).trim(); }
-  else if (anchorHref){ url = anchorHref; }
-  else { const bare = rest.match(/(https?:\/\/[^\s)]+)/i); if (bare){ url = bare[1]; rest = rest.replace(bare[0], '').trim(); } }
-
-  // Authors: a trailing non-URL parenthetical, e.g. "(Blagosklonny)".
-  let authors = '';
-  const ap = rest.match(/\(([^)]*)\)\s*$/);
-  if (ap && !/https?:\/\//i.test(ap[1])){ authors = ap[1].trim(); rest = rest.slice(0, ap.index).trim(); }
-
-  let pageName = rest.replace(/[\s\u2014\u2013-]+$/, '').trim();
-  if (!pageName) pageName = url;                       // link the URL itself when there's no title
-  if (!url && !pageName) return null;
-  return { org, pageName, url, authors };
-}
-
-/* Turn a table row into {org, pageName, url, authors, extra}. The Healthdirect
-   references table has a fixed layout:
-     col 0 = Publisher
-     col 1 = Page title (with any authors in a trailing "(…)")
-     col 2 = Link — a URL (plain text or an <a href>), or, for print-only
-             sources, edition/version details instead of a link. */
-function parseRefRow(tr){
-  const cells = Array.from(tr.children).filter(c => /^(td|th)$/i.test(c.tagName));
-  if (!cells.length) return null;
-  if (cells.every(c => c.tagName.toLowerCase() === 'th')) return null;
-  const cellTxt = c => straightenQuotes(norm(c ? c.textContent : ''));
-
-  const org  = cellTxt(cells[0]);
-  const c1   = cellTxt(cells[1]);
-  const c2el = cells[2];
-  const c2   = cellTxt(c2el);
-
-  // URL: prefer the <a href> in the Link cell; otherwise a bare URL in its text.
-  const a2 = c2el ? c2el.querySelector('a[href]') : null;
-  let url = a2 ? a2.getAttribute('href') : '';
-  if (!url){ const m = c2.match(/https?:\/\/\S+/i); if (m) url = m[0]; }
-
-  // Page title + trailing "(authors)" from the Page title cell.
-  let pageName = c1, authors = '';
-  const ap = c1.match(/\(([^)]*)\)\s*$/);
-  if (ap){ authors = ap[1].trim(); pageName = c1.slice(0, ap.index).trim(); }
-
-  // Print-only source: no link, so the Link cell holds edition/version detail.
-  const extra = (!url && c2 && !/^https?:/i.test(c2)) ? c2 : '';
-
-  if (!org && !pageName && !url) return null;
-  return { org, pageName: pageName || url, url, authors, extra };
-}
-
-/* Is this element a heading (real <h*> or a Word heading-styled paragraph)? */
-function isRefStopHeading(el){
-  const tag = el.tagName.toLowerCase();
-  if (/^h[1-6]$/.test(tag)) return true;
-  return /\bh(?:ld)?h?[1-6]\b|head(?:ing)?\s*[1-6]/i.test(el.getAttribute('class') || '');
-}
-
-/* Build the "Source references" segment from the RAW input (which still has the
-   links — the converted output strips them). Reads whatever follows the
-   references heading (a bullet list, bullet paragraphs, or a table) and formats
-   each entry as:  Organisation — <a>Page name</a> (Authors)
-   with the page name hyperlinked to the source URL. Returns null if none. */
-function buildReferencesSegment(rawInput, site){
-  const doc = new DOMParser().parseFromString(rawInput, 'text/html');
-  const REF_RE  = /^(sources?|references|source references?|reference list)\s*$/i;
-  const HEAD_RE = /^(organi[sz]ations?|authors?|titles?|sources?|references?|pages?|links?|names?|url)s?$/i;
-
-  // Locate the references heading (a leaf-ish element whose whole text is it).
-  const blocks = Array.from(doc.body.querySelectorAll('p,div,h1,h2,h3,h4,h5,h6,ul,ol,table'));
-  let headingIdx = -1;
-  for (let i = 0; i < blocks.length; i++){
-    const t = blocks[i].tagName.toLowerCase();
-    if (t === 'ul' || t === 'ol' || t === 'table') continue;
-    if (REF_RE.test(norm(blocks[i].textContent))){ headingIdx = i; break; }
-  }
-  if (headingIdx === -1) return null;
-  const headingEl = blocks[headingIdx];
-
-  // Collect reference source elements after the heading, stopping at the next
-  // heading. Skip anything nested inside a table/list we've already taken.
-  const parsed = [];
-  let takenContainer = null;
-  for (let i = headingIdx + 1; i < blocks.length; i++){
-    const el = blocks[i];
-    if (takenContainer && takenContainer.contains(el)) continue;
-    takenContainer = null;
-    if (isRefStopHeading(el)) break;
-    const tag = el.tagName.toLowerCase();
-    if (tag === 'ul' || tag === 'ol'){
-      Array.from(el.children).forEach(li => { if (li.tagName.toLowerCase() === 'li'){ const r = parseRefItem(li); if (r) parsed.push(r); } });
-      takenContainer = el; continue;
-    }
-    if (tag === 'table'){
-      Array.from(el.querySelectorAll('tr')).forEach((tr, idx) => {
-        if (idx === 0 && !tr.querySelector('a[href]')){
-          const cells = Array.from(tr.children).filter(c => /^(td|th)$/i.test(c.tagName));
-          const t = cells.map(c => straightenQuotes(norm(c.textContent)));
-          const allTh = cells.length && cells.every(c => c.tagName.toLowerCase() === 'th');
-          const templateHeader = /^publisher$/i.test(t[0] || '') || /^page\s*title$/i.test(t[1] || '') || /^link\b/i.test(t[2] || '');
-          const labelHeader = cells.length >= 2 && t.every(x => !x || HEAD_RE.test(x));
-          if (allTh || templateHeader || labelHeader) return;   // header row
-        }
-        const r = parseRefRow(tr); if (r) parsed.push(r);
-      });
-      takenContainer = el; continue;
-    }
-    if (tag === 'div' && el.querySelector('p,div,ul,ol,table,li')) continue;   // container — its children come next
-    // paragraph / leaf div -> one reference line (skip empty and header labels)
-    const txt = norm(el.textContent);
-    if (!txt || HEAD_RE.test(txt)) continue;
-    const r = parseRefItem(el); if (r) parsed.push(r);
-  }
-
-  // Format each parsed entry into a bullet, hyperlinking the page name.
-  const items = parsed.map(r => {
-    let li = r.org ? esc(r.org) : '';
-    const linked = r.url ? refAnchor(r.url, r.pageName || r.url, site) : esc(r.pageName || '');
-    if (linked){ li += (r.org ? ' — ' : ''); li += linked; }
-    if (r.authors && r.authors !== r.org && r.authors !== r.pageName) li += ` (${esc(r.authors)})`;
-    if (r.extra && r.extra !== r.pageName && r.extra !== r.authors) li += ` (${esc(r.extra)})`;
-    return '    <li>' + li + '</li>';
-  }).filter(li => !/^\s*<li>\s*<\/li>\s*$/.test(li));
-
-  if (!items.length) return null;
-  return {
-    title: 'Source references',
-    kind: 'references',
-    id: '',
-    html: '<ul>\n' + items.join('\n') + '\n</ul>',
-    callouts: []
-  };
-}
-
-/* Build the per-H2 segments from a converted (absolute-link) fragment. */
-function buildOptimizelySegments(html, site, rawInput){
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const REF_RE = /^(sources?|references|source references?|reference list)\s*$/i;
-
-  rewriteLinksForSite(doc, site);
-
-  // Images -> text notes (figures first, then any stray <img>).
-  doc.querySelectorAll('figure').forEach(fig => {
-    const cap = fig.querySelector('figcaption');
-    fig.replaceWith(imageNoteNode(doc, cap ? norm(cap.textContent) : ''));
-  });
-  doc.querySelectorAll('img').forEach(img => {
-    img.replaceWith(imageNoteNode(doc, norm(img.getAttribute('alt') || '')));
-  });
-
-  // Split top-level blocks into segments at each H2.
-  const segments = [];
-  let cur = null;
-  let skipRef = false;                                             // inside a references section (handled separately)
-  const start = (title, kind) => { cur = {title, kind, id:'', nodes:[], callouts:[]}; segments.push(cur); };
-
-  Array.from(doc.body.children).forEach(node => {
-    const tag = node.tagName.toLowerCase();
-    const cls = node.getAttribute('class') || '';
-    if (/cont_nav-index-table/.test(cls)) return;                // never include the generated nav
-
-    if (tag === 'h2'){
-      // A references heading ends the normal flow — the references are rebuilt
-      // as their own final segment (with links) further down.
-      if (REF_RE.test(norm(node.textContent))){ skipRef = true; cur = null; return; }
-      skipRef = false;
-      start(norm(node.textContent) || 'Section', 'section');     // heading -> separate Title + ID
-      cur.id = node.id || '';
-      return;
-    }
-    if (skipRef) return;                                          // drop the stripped references body
-
-    if (tag === 'div' && /cont_layout-standout/.test(cls)){      // Key facts box -> its own segment
-      start('Key facts', 'key facts');
-      // The Key facts field takes only <li> elements, pasted as text — so
-      // reduce the box to a bare bullet list of its items.
-      cur.liHtml = Array.from(node.querySelectorAll('li'))
-        .map(li => '<li>' + li.innerHTML.trim() + '</li>').join('\n');
-      cur = null; return;
-    }
-
-    // Standard callout boxes are shared Optimizely blocks — they are NOT copied
-    // as code. Instead the current segment gets a persistent note telling the
-    // author which block to drag in at the bottom of that section.
-    const co = calloutInfo(node);
-    if (co){
-      if (!cur) start('Introduction', 'intro');
-      cur.callouts.push(co);
-      return;
-    }
-
-    if (!cur) start('Introduction', 'intro');                    // content before the first H2
-    cur.nodes.push(node);
-  });
-
-  const built = segments
-    .map(seg => ({
-      title: seg.title,
-      kind: seg.kind,
-      id: seg.id || '',
-      callouts: seg.callouts || [],
-      html: (seg.liHtml != null ? seg.liHtml : seg.nodes.map(n => n.outerHTML).join('\n'))
-              .replace(/\n{3,}/g, '\n\n').trim()
-    }))
-    // Keep a segment if it has body, is a section (title/ID still needed), or carries callout notes.
-    .filter(seg => seg.html || seg.kind === 'section' || (seg.callouts && seg.callouts.length));
-
-  // Source references become the final segment, formatted as a bullet list.
-  const refSeg = buildReferencesSegment(rawInput || '', site);
-  if (refSeg) built.push(refSeg);
-
-  return built;
-}
-
-/* Copy a string to the clipboard as RICH html (text/html) + plain text.
-   The copy-event override is tried FIRST and is the reliable path: it writes
-   the RAW string straight to the clipboard, so relative hrefs like "/diabetes"
-   are never resolved against this page's domain (the bug that produced
-   "https://<this-host>/diabetes"). The async Clipboard API is only a fallback
-   for the rare case where execCommand('copy') is unavailable. */
-function copyViaCopyEvent(html){
-  let ok = false;
-  const holder = document.createElement('span');
-  holder.textContent = 'copy';
-  holder.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
-  document.body.appendChild(holder);
-  const range = document.createRange(); range.selectNodeContents(holder);
-  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
-  const handler = e => {
-    e.preventDefault();
-    e.clipboardData.setData('text/html', html);
-    e.clipboardData.setData('text/plain', html);
-    ok = true;
-  };
-  document.addEventListener('copy', handler);
-  try { if (!document.execCommand('copy')) ok = false; } catch (e){ ok = false; }
-  document.removeEventListener('copy', handler);
-  sel.removeAllRanges(); holder.remove();
-  return ok;
-}
-async function copyRich(html){
-  if (copyViaCopyEvent(html)) return true;
-  try {
-    if (navigator.clipboard && window.ClipboardItem){
-      await navigator.clipboard.write([new ClipboardItem({
-        'text/html':  new Blob([html], {type:'text/html'}),
-        'text/plain': new Blob([html], {type:'text/plain'})
-      })]);
-      return true;
-    }
-  } catch (e){ /* ignore */ }
-  return false;
-}
-
-/* Render the Optimizely segments into their tab. */
-function renderOptimizely(segments, site){
-  const box = $('#optiSegments');
-  const count = $('#optiCount');
-  box._segments = segments;
-  if (!segments.length){
-    box.innerHTML = '<p class="note">No content to segment yet — convert something first.</p>';
-    count.style.display = 'none';
-    return;
-  }
-  const siteName = site === 'pbb' ? 'Pregnancy, Birth &amp; Baby' : 'Healthdirect';
-  let out = `<p class="note">${segments.length} segment${segments.length>1?'s':''} · site-internal links made relative for <strong>${siteName}</strong>.</p>`;
-  segments.forEach((seg, i) => {
-    const badge = seg.kind === 'section' ? 'info'
-                : seg.kind === 'key facts' ? 'ok'
-                : seg.kind === 'references' ? 'info' : 'warn';
-    out += '<div class="seg">';
-    out +=   '<div class="seg-head">'
-      +        `<span class="seg-title">${esc(seg.title)}</span>`
-      +        `<span class="badge ${badge}">${esc(seg.kind)}</span>`
-      +      '</div>';
-
-    // Sections expose the heading as separate Title + ID fields.
-    if (seg.kind === 'section'){
-      out += '<div class="seg-fields">';
-      out +=   '<div class="seg-field">'
-        +        '<span class="seg-flabel">Title</span>'
-        +        `<code class="seg-fval">${esc(seg.title)}</code>`
-        +        `<button class="btn small opti-copy" data-i="${i}" data-field="title" data-copy="text">Copy</button>`
-        +      '</div>';
-      out +=   '<div class="seg-field">'
-        +        '<span class="seg-flabel">ID</span>'
-        +        `<code class="seg-fval">${seg.id ? esc(seg.id) : '<span class="muted">none</span>'}</code>`
-        +        `<button class="btn small opti-copy" data-i="${i}" data-field="id" data-copy="text"${seg.id ? '' : ' disabled'}>Copy</button>`
-        +      '</div>';
-      out += '</div>';
-    }
-
-    // Body (or, for Key facts / references, the bullet list). Only shown when
-    // there is body content — a section may be heading + callout only.
-    if (seg.html){
-      const bodyLabel = seg.kind === 'key facts'  ? 'Bullet list (&lt;li&gt; items)'
-                      : seg.kind === 'references' ? 'Source references (bullet list)'
-                      : seg.kind === 'section'    ? 'Body' : 'Content';
-      out += '<div class="seg-bodyhead">'
-        +      `<span class="seg-flabel" style="min-width:auto">${bodyLabel}</span>`
-        +      '<span style="flex:1"></span>'
-        +      `<button class="btn small opti-copy" data-i="${i}" data-field="body" data-copy="rich">Copy for Optimizely</button>`
-        +      `<button class="btn small ghost opti-copy" data-i="${i}" data-field="body" data-copy="text">Copy source</button>`
-        +      `<button class="btn small ghost opti-select" data-i="${i}">Select all</button>`
-        +    '</div>';
-      out += `<pre class="seg-src">${esc(seg.html)}</pre>`;
-    }
-
-    // Persistent notes for any standard callout boxes assigned to this section —
-    // these are shared blocks the author drags in; the code is not copied.
-    (seg.callouts || []).forEach(co => {
-      out += '<div class="seg-callout">'
-        +      '<span class="tag">Callout block</span>'
-        +      `<strong>${esc(co.name)}</strong> — drag the shared block in at the bottom of this section.`
-        +      `<div class="msg">${esc(co.text)}</div>`
-        +    '</div>';
-    });
-
-    out += '</div>';
-  });
-  box.innerHTML = out;
-  count.style.display = '';
-  count.className = 'badge info';
-  count.textContent = segments.length + ' seg' + (segments.length>1?'s':'');
-}
-
-/* Rebuild the Optimizely segments from the last converted input + current site. */
-function refreshOptimizely(){
-  const site = $('#optSite').value;
-  if (!lastConvertInput.trim()){ renderOptimizely([], site); return; }
-  const res = convert(lastConvertInput, Object.assign({}, opts(), {relative:false, nav:false}));
-  renderOptimizely(buildOptimizelySegments(res.html, site, lastConvertInput), site);
-}
-
-/* The site decides which links are relative and which redirects apply, so
-   changing it rebuilds both outputs. */
-$('#optSite').addEventListener('change', () => {
-  if (lastConvertInput.trim()) runConvert(); else refreshOptimizely();
-});
-$('#optiSegments').addEventListener('click', async e => {
-  const btn = e.target.closest('button'); if (!btn) return;
-  const segs = $('#optiSegments')._segments || [];
-  const seg = segs[+btn.dataset.i]; if (!seg) return;
-
-  // Select all: highlight this segment's source so the user can press Ctrl/Cmd+C.
-  if (btn.classList.contains('opti-select')){
-    const pre = btn.closest('.seg').querySelector('.seg-src');
-    if (pre){
-      const range = document.createRange(); range.selectNodeContents(pre);
-      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
-      pre.scrollIntoView({block:'nearest'});
-      toast('Selected — press Ctrl/Cmd+C to copy');
-    }
-    return;
-  }
-
-  const field = btn.dataset.field;
-  let content, what;
-  if (field === 'title'){ content = seg.title; what = 'Title'; }
-  else if (field === 'id'){ content = seg.id || ''; what = 'ID'; }
-  else { content = seg.html || ''; what = seg.kind === 'key facts' ? 'Key facts' : (seg.title || 'Segment'); }
-  if (!content){ toast('Nothing to copy'); return; }
-  if (btn.dataset.copy === 'rich'){
-    const ok = await copyRich(content);
-    toast(ok ? ('Copied ' + what + ' for Optimizely') : 'Copy failed — use Select all, then Ctrl/Cmd+C');
-  } else {
-    let ok = false;
-    try { await navigator.clipboard.writeText(content); ok = true; } catch { ok = await copyRich(content); }
-    toast(ok ? (what + ' copied') : 'Copy failed — use Select all, then Ctrl/Cmd+C');
-  }
-});
-
-/* run conversion */
 function runConvert(){
   const input = getInput();
   if (!input.trim()){ toast('Paste some content first'); return; }
-  clearRedirectLog();                       // start a fresh list of link rewrites
-  const res = convert(input, opts());
-  const redirectsApplied = uniqueRedirects(redirectLog);
-  currentHtml = res.html;
-  lastConvertInput = input;
-
-  // output
-  $('#outCode').textContent = res.html;
-  $('#btnCopy').disabled = false;
-  $('#btnDownload').disabled = false;
+  const res = safeConvert(input, opts());
+  if (!res) return;
+  lastResult = res;
 
   // warnings
-  const w = $('#warnings');
-  if (res.warnings.length){
-    w.innerHTML = '<ul class="report" style="margin-top:12px">' +
-      res.warnings.map(([lvl,msg]) => `<li><span class="badge ${lvl==='warn'?'warn':'info'}">${lvl}</span> ${esc(msg)}</li>`).join('') +
-      '</ul>';
-  } else w.innerHTML = '';
+  $('#warnings').innerHTML = res.warnings.length
+    ? '<ul class="report" style="margin:8px 0 12px">' + res.warnings.map(([lvl,msg]) =>
+        `<li><span class="badge ${lvl==='warn'?'warn':'info'}">${lvl}</span> ${esc(msg)}</li>`).join('') + '</ul>'
+    : '';
+
+  // links that were pointed at a new URL
+  renderRedirectReport(res.redirects);
 
   // stats
   const s = res.stats;
-  let stat = `${s.headings} headings · ${s.paras} paragraphs · ${s.ctas} CTA snippet${s.ctas!==1?'s':''} · ${s.keyFacts} key facts`;
-  if (redirectsApplied.length) stat += ` · ${redirectsApplied.length} link${redirectsApplied.length!==1?'s':''} updated`;
-  $('#reportStat').textContent = stat;
+  $('#reportStat').textContent =
+    `${s.sections} section${s.sections!==1?'s':''} · ${s.headings} headings · ${s.ctas} CTA${s.ctas!==1?'s':''} · ${s.keyFacts} key facts`
+    + (s.sources ? ` · ${s.sources} source${s.sources!==1?'s':''}` : '')
+    + (res.redirects.length ? ` · ${res.redirects.length} link${res.redirects.length!==1?'s':''} updated` : '');
 
-  // preview
-  $('#previewBox').innerHTML = res.html || 'Nothing to preview.';
+  safePanel('Page fields', () => renderFields(res), $('#fieldsBox'));
+  safePanel('Structure preview', () => renderOutline(res.outline), $('#previewBox'));
+  resetHtmlTab(true);
 
-  // links
-  currentLinks = analyseLinks(res.html, currentSite());
-  renderRedirectReport(redirectsApplied);
-  renderStaticReport(currentLinks);
-  renderLinksTable(currentLinks.rows);
-  const lc = $('#linkCount');
-  const errCount = currentLinks.issues.filter(i=>i[0]==='err').length;
-  const warnCount = currentLinks.issues.filter(i=>i[0]==='warn').length;
-  lc.style.display = '';
-  lc.className = 'badge ' + (errCount ? 'err' : warnCount ? 'warn' : 'ok');
-  lc.textContent = errCount ? (errCount+' err') : warnCount ? (warnCount+' warn') : 'ok';
-
-  // Optimizely field segments
-  refreshOptimizely();
-
+  $('#tab-fields').click();
   toast('Converted');
 }
 
 $('#btnConvert').addEventListener('click', runConvert);
+['#optDocType', '#optSite', '#optRedirects', '#optRelative'].forEach(id =>
+  $(id).addEventListener('change', () => { if (lastResult) runConvert(); }));
 
-$('#btnCopy').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(currentHtml); toast('HTML copied'); }
-  catch { const t=$('#outCode'); const r=document.createRange(); r.selectNodeContents(t);
-          const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Selected — press Ctrl/Cmd+C'); }
+/* Full HTML: only built when asked for. */
+$('#btnFullHtml').addEventListener('click', () => {
+  if (!lastResult) return;
+  currentHtml = lastResult.html;
+  $('#outCode').textContent = currentHtml;
+  $('#btnCopy').disabled = false;
+  $('#btnDownload').disabled = false;
 });
 
+$('#btnCopy').addEventListener('click', () => copyPlain(currentHtml, 'HTML'));
+
 $('#btnDownload').addEventListener('click', () => {
-  const name = (currentLinks && '') || 'healthdirect-content';
   const blob = new Blob([currentHtml], {type:'text/html'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1716,14 +1671,12 @@ $('#btnDownload').addEventListener('click', () => {
 
 $('#btnClear').addEventListener('click', () => {
   wordEditor.innerHTML = ''; $('#htmlInput').value = ''; lastWordPaste = null;
-  currentHtml = ''; currentLinks = null; lastConvertInput = '';
-  refreshOptimizely();
-  $('#outCode').textContent = 'Your converted HTML will appear here.';
-  $('#previewBox').textContent = 'Convert something to preview it.';
-  $('#redirectReport').innerHTML = '';
-  $('#staticReport').innerHTML = ''; $('#linksTable').querySelector('tbody').innerHTML = '';
-  $('#warnings').innerHTML=''; $('#reportStat').textContent=''; $('#inputStat').textContent='';
-  $('#btnCopy').disabled = true; $('#btnDownload').disabled = true; $('#linkCount').style.display='none';
+  lastResult = null; copyStore = [];
+  $('#fieldsBox').innerHTML = '<p class="note">Convert something to see the page fields.</p>';
+  $('#previewBox').innerHTML = '<p class="note">Convert something to preview it.</p>';
+  $('#warnings').innerHTML = ''; $('#redirectReport').innerHTML = ''; $('#reportStat').textContent = ''; $('#inputStat').textContent = '';
+  $('#fieldCount').style.display = 'none';
+  resetHtmlTab(false);
   toast('Cleared');
 });
 
@@ -1750,82 +1703,6 @@ $('#btnSample').addEventListener('click', () => {
 <p class="Normaltext">For more support, contact <a href="https://www.cancer.org.au/">Cancer Council Australia</a>.</p>`;
   updateInputStat();
   toast('Sample loaded — click Convert');
-});
-
-/* ---------- live link check (via proxy) ----------
-   Tune these two values if you want faster/slower checking. */
-const LIVE_WAIT_MS    = 1000;    // pause between requests so we don't fire all at once
-const LIVE_TIMEOUT_MS = 12000;   // give up on any single request after this long
-
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-function fetchWithTimeout(url, ms){
-  const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), ms);
-  return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(t));
-}
-const STATUS_TEXT = {200:'OK',201:'Created',204:'No content',301:'Moved permanently',302:'Found',303:'See other',307:'Temporary redirect',308:'Permanent redirect',400:'Bad request',401:'Unauthorised',403:'Forbidden',404:'Not found',410:'Gone',429:'Too many requests',500:'Server error',502:'Bad gateway',503:'Unavailable',504:'Gateway timeout'};
-const statusLabel = c => c + (STATUS_TEXT[c] ? ' ' + STATUS_TEXT[c] : '');
-// True if the final URL is meaningfully different from what we requested (a redirect).
-function isRedirect(requested, finalUrl){
-  if (!finalUrl) return false;
-  const tidy = u => u.replace(/\/+$/,'').toLowerCase();
-  return tidy(requested) !== tidy(finalUrl);
-}
-
-$('#btnLive').addEventListener('click', async () => {
-  const proxy = $('#proxyUrl').value.trim();
-  if (!proxy.includes('{url}')){ toast('Proxy URL must contain {url}'); return; }
-
-  const btn = $('#btnLive');
-  // The table only contains testable links, each carrying its absolute URL.
-  const jobs = Array.from(document.querySelectorAll('#linksTable tbody tr')).filter(tr => tr.dataset.abs);
-  if (!jobs.length){ toast('No testable links to check'); return; }
-
-  btn.disabled = true;
-  let done = 0;
-  for (const tr of jobs){
-    const target = tr.dataset.abs;
-    const resCell = tr.querySelector('.resolveCell');
-    const finCell = tr.querySelector('.finalCell');
-    resCell.innerHTML = '<span class="muted">checking…</span>';
-    $('#liveStat').textContent = `Checking ${done + 1} of ${jobs.length}…`;
-
-    try {
-      const resp = await fetchWithTimeout(proxy.replace('{url}', encodeURIComponent(target)), LIVE_TIMEOUT_MS);
-      let code = resp.status, finalUrl = '';
-      // allorigins /get?url= returns JSON: { status: { http_code, url } }
-      try {
-        const j = await resp.clone().json();
-        if (j && j.status){
-          if (j.status.http_code) code = j.status.http_code;
-          if (j.status.url) finalUrl = j.status.url;
-        }
-      } catch { /* non-JSON proxy: fall back to the proxy's own status */ }
-
-      let cls = 'ok';
-      if (code === 0){ cls = 'err'; }
-      else if (code >= 400){ cls = 'err'; }
-      else if (code >= 300){ cls = 'warn'; }
-      resCell.innerHTML = `<span class="badge ${cls}">${code ? esc(statusLabel(code)) : 'no response'}</span>`;
-
-      if (isRedirect(target, finalUrl)){
-        finCell.innerHTML = `<a href="${escAttr(finalUrl)}" target="_blank" rel="noopener">${esc(finalUrl)}</a>`;
-        if (cls === 'ok') resCell.innerHTML = `<span class="badge warn">${esc(statusLabel(code))} · redirected</span>`;
-      } else {
-        finCell.innerHTML = '<span class="muted">—</span>';
-      }
-    } catch (err){
-      const aborted = err && err.name === 'AbortError';
-      resCell.innerHTML = `<span class="badge err">${aborted ? 'timed out' : 'could not check'}</span>`;
-      finCell.innerHTML = '<span class="muted">—</span>';
-    }
-
-    done++;
-    $('#liveStat').textContent = `Checked ${done} of ${jobs.length}`;
-    if (done < jobs.length) await sleep(LIVE_WAIT_MS);   // space out requests
-  }
-  $('#liveStat').textContent = `Done — checked ${jobs.length} link${jobs.length !== 1 ? 's' : ''}.`;
-  btn.disabled = false;
 });
 
 /* =====================================================================
@@ -6943,6 +6820,5 @@ function splitRedirectUrl(url){
   return { site: '', path: '' };
 }
 </script>
-
 </body>
 </html>
