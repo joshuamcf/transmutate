@@ -594,6 +594,117 @@ function cleanReferencesTable(html){
   return out;
 }
 
+/* Clean a body table. Word pastes its tables with its own markup (MsoTableGrid,
+   widths, borders, mso-… styles, MsoNormal paragraphs), which blocks the site's
+   table styling, and the bullets inside cells are lost: the bullet glyph is
+   hidden markup, so each bullet turns into a plain paragraph. The table is
+   rebuilt from scratch instead: only table/thead/tbody/tr/th/td, with colspan
+   and rowspan kept. Each cell holds cleaned text, <p> blocks and real <ul>/<ol>
+   lists. Everything goes through cleanInline(), so links and bold/italic follow
+   the same site, redirect and new-tab rules as body text.
+   The first row becomes the <thead> if it sits in a <thead>, is all <th>, or
+   (in a table of two or more rows) every filled cell is wrapped in one <strong>.
+   Rows with no content (Word adds hidden spacer rows) are dropped. */
+function cleanBodyTable(table, opt){
+  const BLOCK = /^(p|div|ul|ol|h[1-6]|table)$/;
+  const BULLET_CHAR = /^\s*[•·●▪◦\-]\s+/;
+  const tagOf = el => el.tagName.toLowerCase();
+  const hasBlock = el => Array.from(el.children).some(c => BLOCK.test(tagOf(c)));
+  // A real Word bullet (flagged in convert(), or still carrying mso-list) or a typed bullet glyph.
+  const isBulletPara = el => el.hasAttribute('data-word-list')
+    || /mso-list:\s*l\d/i.test(el.getAttribute('style') || '')
+    || /^\s*[•·●▪◦]\s/.test(el.textContent || '');
+
+  // <ul>/<ol> -> list HTML, keeping nested lists inside their <li>.
+  const listHtml = list => {
+    const tag = tagOf(list);
+    const items = Array.from(list.children).filter(c => tagOf(c) === 'li').map(li => {
+      const own = li.cloneNode(true);
+      own.querySelectorAll('ul, ol').forEach(n => n.remove());
+      const nested = Array.from(li.children).filter(c => /^(ul|ol)$/.test(tagOf(c))).map(listHtml).join('');
+      const text = cleanInline(own, opt).replace(BULLET_CHAR, '').trim();
+      return (text || nested) ? '<li>' + text + nested + '</li>' : '';
+    }).filter(Boolean);
+    return items.length ? `<${tag}>${items.join('')}</${tag}>` : '';
+  };
+
+  // One cell -> its inner HTML. A single paragraph is returned without its <p>.
+  const cellHtml = cell => {
+    if (!hasBlock(cell)) return cleanInline(cell, opt).trim();
+    const pieces = [];           // finished blocks, in order
+    let pending = [];            // inline nodes waiting to become a paragraph
+    let bullets = [];            // consecutive bullet items waiting to become a <ul>
+    const flushBullets = () => {
+      if (bullets.length) pieces.push({type:'list', html:'<ul>' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>'});
+      bullets = [];
+    };
+    const addPara = html => { if (html){ flushBullets(); pieces.push({type:'p', html}); } };
+    const flushInline = () => {
+      if (!pending.length) return;
+      const wrap = cell.ownerDocument.createElement('div');
+      pending.forEach(n => wrap.appendChild(n.cloneNode(true)));
+      pending = [];
+      addPara(cleanInline(wrap, opt).trim());
+    };
+    const visit = parent => Array.from(parent.childNodes).forEach(n => {
+      if (n.nodeType !== 1){ if (n.nodeType === 3) pending.push(n); return; }
+      const tag = tagOf(n);
+      if (!BLOCK.test(tag)){ pending.push(n); return; }     // inline run (a, b, span ...)
+      flushInline();
+      if (tag === 'ul' || tag === 'ol'){
+        flushBullets();
+        const h = listHtml(n);
+        if (h) pieces.push({type:'list', html:h});
+      } else if (tag === 'table'){
+        flushBullets();
+        const h = cleanBodyTable(n, opt).replace(/\n\s*/g, '');
+        if (h) pieces.push({type:'list', html:h});
+      } else if (tag === 'div' && hasBlock(n)){
+        visit(n); flushInline();                            // a div that just wraps paragraphs
+      } else {                                              // p, h1-h6, or a div with only inline content
+        const html = cleanInline(n, opt).trim();
+        if (!html) return;
+        if (isBulletPara(n)){ const item = html.replace(BULLET_CHAR, '').trim(); if (item) bullets.push(item); }
+        else addPara(html);
+      }
+    });
+    visit(cell); flushInline(); flushBullets();
+    if (pieces.length === 1 && pieces[0].type === 'p') return pieces[0].html;
+    return pieces.map(p => p.type === 'p' ? '<p>' + p.html + '</p>' : p.html).join('');
+  };
+
+  // Rows that belong to this table (not to a table nested in a cell), without empty spacer rows.
+  const rows = Array.from(table.querySelectorAll('tr')).filter(tr => tr.closest('table') === table).map(tr => ({
+    inThead: !!tr.parentElement && tagOf(tr.parentElement) === 'thead',
+    cells: Array.from(tr.children).filter(c => /^(td|th)$/.test(tagOf(c))).map(c => ({
+      tag: tagOf(c),
+      html: cellHtml(c),
+      colspan: parseInt(c.getAttribute('colspan'), 10) || 1,
+      rowspan: parseInt(c.getAttribute('rowspan'), 10) || 1
+    }))
+  })).filter(r => r.cells.some(c => c.html));
+  if (!rows.length) return '';
+
+  const BOLD_ONLY = /^<strong>((?:(?!<\/?strong>)[\s\S])*)<\/strong>$/;
+  const filled = rows[0].cells.filter(c => c.html);
+  const isHead = rows[0].inThead
+    || rows[0].cells.every(c => c.tag === 'th')
+    || (rows.length > 1 && filled.every(c => BOLD_ONLY.test(c.html)));
+
+  const cellOut = (c, head) => {
+    const tag = head ? 'th' : c.tag;
+    const html = head ? c.html.replace(BOLD_ONLY, '$1') : c.html;   // header cells are bold already
+    return `<${tag}${c.colspan > 1 ? ` colspan="${c.colspan}"` : ''}${c.rowspan > 1 ? ` rowspan="${c.rowspan}"` : ''}>${html}</${tag}>`;
+  };
+  const rowOut = (r, head) => '        <tr>' + r.cells.map(c => cellOut(c, head)).join('') + '</tr>';
+
+  let out = '<table>\n';
+  if (isHead) out += '    <thead>\n' + rowOut(rows[0], true) + '\n    </thead>\n';
+  const bodyRows = isHead ? rows.slice(1) : rows;
+  if (bodyRows.length) out += '    <tbody>\n' + bodyRows.map(r => rowOut(r, false)).join('\n') + '\n    </tbody>\n';
+  return out + '</table>';
+}
+
 /* Headings that start special sections (see convert()).
    META_RE: SEO metadata sections — dropped from the body.
    REF_RE:  "Source references" sections — kept out of the nav. */
@@ -1165,7 +1276,14 @@ function convert(rawHtml, opt){
         addParagraph(el, cls, style);
         return;
       }
-      if (tag === 'table' || tag === 'figure' || tag === 'blockquote' || tag === 'img' || tag === 'a' || tag === 'nav'){
+      if (tag === 'table'){
+        // Word's table markup is rebuilt as plain table markup (see cleanBodyTable).
+        const html = cleanBodyTable(el, opt);
+        // rawHtml keeps Word's original table for the Source references pass, which has its own rules.
+        if (html) blocks.push({kind:'raw', html, rawHtml: el.outerHTML, text: norm(el.textContent)});
+        return;
+      }
+      if (tag === 'figure' || tag === 'blockquote' || tag === 'img' || tag === 'a' || tag === 'nav'){
         blocks.push({kind:'raw', html: el.outerHTML, text: norm(el.textContent)});
         return;
       }
@@ -1374,7 +1492,7 @@ function convert(rawHtml, opt){
       }
       if (nb.kind === 'h' && nb.level <= b.level) break;     // end of this section
       if (nb.kind === 'raw' && /^<table/i.test((nb.html||'').trim())){
-        nb.html = cleanReferencesTable(nb.html);
+        nb.html = cleanReferencesTable(nb.rawHtml || nb.html);
       }
       hasContent = true;
     }
